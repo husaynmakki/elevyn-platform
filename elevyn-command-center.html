@@ -227,6 +227,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     <div class="nav-item" data-page="leads"><span class="ic">&#9737;</span><span class="lbl">Leads</span></div>
     <div class="nav-item" data-page="reps"><span class="ic">&#9787;</span><span class="lbl">Sales Reps</span></div>
     <div class="nav-item" data-page="marketing"><span class="ic">&#9993;</span><span class="lbl">Marketing</span></div>
+    <div class="nav-item" data-page="reports"><span class="ic">&#128202;</span><span class="lbl">Marketing Reports</span></div>
     <div class="nav-item" data-page="seo"><span class="ic">&#128269;</span><span class="lbl">SEO Strategy</span></div>
   </div>
 
@@ -260,6 +261,13 @@ tr:hover td{background:rgba(255,255,255,0.015);}
   <div class="sb-foot">
     <div class="who">Admin User</div>
     <div class="role">Owner / Full Access</div>
+    <div style="margin-top:14px;display:flex;gap:6px;">
+      <button class="btn btn-sm" style="flex:1;" onclick="exportAllData()">Backup</button>
+      <label class="btn btn-sm" style="flex:1;text-align:center;cursor:pointer;">
+        Restore
+        <input type="file" id="restore-file-input" accept="application/json" style="display:none;" onchange="importAllData(event)">
+      </label>
+    </div>
   </div>
 </div>
 
@@ -310,6 +318,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     <div class="topbar">
       <div><h1>Lead Management</h1><div class="sub">Every lead across both sites, from first touch to member</div></div>
       <div class="topbar-actions">
+        <button class="btn" onclick="exportLeadsCSV()">Export CSV</button>
         <button class="btn" onclick="findLeadsDemo()">Find New Leads</button>
         <button class="btn btn-solid" onclick="openLeadModal()">+ Add Lead</button>
       </div>
@@ -477,6 +486,50 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     </div>
   </div>
 
+  <!-- MARKETING REPORTS -->
+  <div class="page" id="page-reports">
+    <div class="topbar"><div><h1>Marketing Reports</h1><div class="sub">Attribution, call tracking, appointments, and a local listing health check</div></div></div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="view-tabs" id="reports-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="attribution" onclick="setReportsTab('attribution')">Attribution</button>
+        <button class="vtab" data-v="calls" onclick="setReportsTab('calls')">Call Report</button>
+        <button class="vtab" data-v="appointments" onclick="setReportsTab('appointments')">Appointments</button>
+        <button class="vtab" data-v="audit" onclick="setReportsTab('audit')">Local Marketing Audit</button>
+      </div>
+
+      <div id="report-attribution">
+        <div class="panel">
+          <div class="panel-head"><h3>Lead Source Attribution</h3><div class="muted">Last 30 Days</div></div>
+          <div class="panel-body" id="attribution-chart"></div>
+        </div>
+        <div class="panel">
+          <table><thead><tr><th>Source</th><th>Leads</th><th>Opportunities</th><th>Won</th><th>Cost</th><th>Cost per Lead</th></tr></thead><tbody id="attribution-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-calls" style="display:none;">
+        <div class="kpi-row" id="calls-kpi-row" style="grid-template-columns:repeat(4,1fr);"></div>
+        <div class="panel">
+          <table><thead><tr><th>Caller</th><th>Number</th><th>Direction</th><th>Duration</th><th>Outcome</th><th>Date</th></tr></thead><tbody id="calls-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-appointments" style="display:none;">
+        <div class="kpi-row" id="appt-kpi-row" style="grid-template-columns:repeat(4,1fr);"></div>
+        <div class="panel">
+          <table><thead><tr><th>Name</th><th>Type</th><th>Staff</th><th>Date</th><th>Status</th></tr></thead><tbody id="appt-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-audit" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Local Marketing Audit</h3><div class="muted">Google Business Profile &amp; local listing health</div></div>
+          <table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody id="audit-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SEO -->
   <div class="page" id="page-seo">
     <div class="topbar"><div><h1>SEO Strategy</h1><div class="sub">Keyword tracking across both sites, tied to the quarterly trend review cadence</div></div></div>
@@ -493,6 +546,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     <div class="topbar">
       <div><h1>Memberships</h1><div class="sub">Every member record, linked to a scannable barcode ID</div></div>
       <div class="topbar-actions">
+        <button class="btn" onclick="exportMembersCSV()">Export CSV</button>
         <button class="btn" onclick="simulateScan()">Simulate Barcode Scan</button>
         <button class="btn btn-solid" onclick="openMemberModal()">+ New Member</button>
       </div>
@@ -507,7 +561,10 @@ tr:hover td{background:rgba(255,255,255,0.015);}
   <div class="page" id="page-billing">
     <div class="topbar">
       <div><h1>Billing &amp; Payments</h1><div class="sub">Recurring schedules, one-time charges, coupons, and gift cards</div></div>
-      <div class="topbar-actions"><button class="btn btn-solid" onclick="openInvoiceModal()">+ New Billing Schedule</button></div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="exportInvoicesCSV()">Export CSV</button>
+        <button class="btn btn-solid" onclick="openInvoiceModal()">+ New Billing Schedule</button>
+      </div>
     </div>
     <div class="page-inner" style="padding:26px 30px;">
       <div class="kpi-row" id="billing-summary" style="grid-template-columns:repeat(3,1fr);"></div>
@@ -739,6 +796,8 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     <div class="topbar">
       <div><h1>Media Library</h1><div class="sub">Photos and videos for both sites and every social channel</div></div>
       <div class="topbar-actions">
+        <button class="btn" id="canva-connect-btn" onclick="toggleCreativeConnection('canva')">Connect Canva</button>
+        <button class="btn" id="drive-connect-btn" onclick="toggleCreativeConnection('drive')">Connect Google Drive</button>
         <label class="btn btn-solid" style="cursor:pointer;">
           Upload Media
           <input type="file" id="media-upload-input" accept="image/*,video/*" multiple style="display:none;" onchange="handleMediaUpload(event)">
@@ -952,6 +1011,94 @@ const DB = {
 };
 
 function uid(prefix){ return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* =========================================================
+   REAL, WORKING UTILITIES — CSV export and full data backup/restore.
+   These are genuine client-side features (not mocked): they read
+   your actual current data and produce a real downloadable file.
+   ========================================================= */
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function toCSV(rows, columns){
+  const esc = (v) => {
+    const s = (v===null || v===undefined) ? '' : String(v);
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const header = columns.map(c=>esc(c.label)).join(',');
+  const lines = rows.map(row => columns.map(c=>esc(typeof c.value==='function' ? c.value(row) : row[c.value])).join(','));
+  return [header, ...lines].join('\r\n');
+}
+function exportLeadsCSV(){
+  const leads = DB.get('leads',[]);
+  const csv = toCSV(leads, [
+    { label:'Name', value:'name' }, { label:'Email', value:'email' }, { label:'Phone', value:'phone' },
+    { label:'Source', value:'source' }, { label:'Score', value:'score' }, { label:'Stage', value:'stage' },
+    { label:'Assigned Rep', value: l=>repName(l.assignedRep) }, { label:'Created', value: l=>fmtDate(l.createdAt) },
+    { label:'Last Contact', value: l=>fmtDate(l.lastContact) },
+  ]);
+  downloadFile('elevyn-leads.csv', csv, 'text/csv');
+  toast(`Exported ${leads.length} leads to CSV.`);
+}
+function exportMembersCSV(){
+  const members = DB.get('members',[]);
+  const csv = toCSV(members, [
+    { label:'Name', value:'name' }, { label:'Email', value:'email' }, { label:'Tier', value:'tier' },
+    { label:'Barcode', value:'barcode' }, { label:'Status', value:'status' },
+    { label:'Frozen', value: m=>m.freeze ? 'Yes' : 'No' }, { label:'Past Due', value: m=>m.pastDue||0 },
+    { label:'Payment Method', value:'paymentMethod' }, { label:'Joined', value: m=>fmtDate(m.joinedAt) },
+    { label:'Last Visit', value: m=>fmtDate(m.lastVisit) },
+  ]);
+  downloadFile('elevyn-members.csv', csv, 'text/csv');
+  toast(`Exported ${members.length} members to CSV.`);
+}
+function exportInvoicesCSV(){
+  const invoices = DB.get('invoices',[]);
+  const csv = toCSV(invoices, [
+    { label:'Member', value:'memberName' }, { label:'Category', value:'category' },
+    { label:'Amount', value: i=>i.amount.toFixed(2) }, { label:'Billing Cycle', value:'billingCycle' },
+    { label:'Next Due', value: i=>fmtDate(i.nextDue) }, { label:'Status', value:'status' },
+  ]);
+  downloadFile('elevyn-invoices.csv', csv, 'text/csv');
+  toast(`Exported ${invoices.length} invoices to CSV.`);
+}
+
+/* ---------- Full backup / restore of every DB key ---------- */
+function exportAllData(){
+  const all = {};
+  for(let i=0; i<localStorage.length; i++){
+    const key = localStorage.key(i);
+    if(key.startsWith('elevynCC_')){
+      all[key] = JSON.parse(localStorage.getItem(key));
+    }
+  }
+  downloadFile('elevyn-command-center-backup.json', JSON.stringify(all, null, 2), 'application/json');
+  toast('Full backup downloaded.');
+}
+function importAllData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try{
+      const data = JSON.parse(evt.target.result);
+      const keys = Object.keys(data).filter(k=>k.startsWith('elevynCC_'));
+      if(!keys.length){ toast('That file doesn\'t look like a valid Command Center backup.'); return; }
+      keys.forEach(key => localStorage.setItem(key, JSON.stringify(data[key])));
+      toast(`Restored ${keys.length} data sets — reloading...`);
+      setTimeout(()=> location.reload(), 1200);
+    } catch(err){
+      toast('Could not read that file — make sure it\'s a Command Center backup JSON.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
 function fmtMoney(n){ return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
 function fmtDate(d){ return new Date(d).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}); }
 function initials(name){ return name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
@@ -1170,6 +1317,44 @@ function seedIfEmpty(){
     { name:'Zahraa Natha', email:'zahraa.n@example.com', tags:['Follow-up'], owner:'Maya Cho',
       messages: [ { from:'them', body:'Hi Zahraa, thank you for reaching out — following up on your Pilates class question.', time: new Date(Date.now()-90000000).toISOString() } ] },
   ].map(c => ({ id: c.id || uid('cv'), ...c })));
+
+  // --- Marketing Reports: Attribution ---
+  DB.set('attributionReport', [
+    { source:'Google Business Profile', leads:38, opportunities:22, won:9, cost:0 },
+    { source:'Instagram Ads', leads:26, opportunities:14, won:5, cost:420 },
+    { source:'Website Form', leads:19, opportunities:11, won:6, cost:0 },
+    { source:'Referral', leads:12, opportunities:9, won:7, cost:0 },
+    { source:'Google Ads', leads:7, opportunities:3, won:1, cost:260 },
+  ]);
+
+  // --- Marketing Reports: Call Report ---
+  DB.set('callReport', [
+    { caller:'Leila Chokr', number:'(313) 555-2213', direction:'Inbound', duration:'4:12', outcome:'Booked Tour', date: new Date(Date.now()-86400000).toISOString() },
+    { caller:'Ali Yasser Chehab', number:'(313) 555-8842', direction:'Inbound', duration:'2:05', outcome:'Info Given', date: new Date(Date.now()-2*86400000).toISOString() },
+    { caller:'Front Desk', number:'(313) 562-1296', direction:'Outbound', duration:'1:33', outcome:'Left Voicemail', date: new Date(Date.now()-3*86400000).toISOString() },
+    { caller:'Sydney Adams', number:'(313) 555-4471', direction:'Inbound', duration:'0:48', outcome:'No Answer', date: new Date(Date.now()-4*86400000).toISOString() },
+  ]);
+
+  // --- Marketing Reports: Appointments ---
+  DB.set('appointmentReport', [
+    { name:'Leila Chokr', type:'Facility Tour', staff:'Jordan Ellis', date: new Date(Date.now()+1*86400000).toISOString(), status:'confirmed' },
+    { name:'Karim Odom', type:'Personal Training', staff:'Riley Fontaine', date: new Date(Date.now()+2*86400000).toISOString(), status:'confirmed' },
+    { name:'Priya Foster', type:'Reformer Pilates', staff:'Maya Cho', date: new Date(Date.now()-1*86400000).toISOString(), status:'completed' },
+    { name:'Devon Reyes', type:'Facility Tour', staff:'Deshawn Price', date: new Date(Date.now()-2*86400000).toISOString(), status:'no-show' },
+  ]);
+
+  // --- Marketing Reports: Local Marketing Audit ---
+  DB.set('localAuditReport', [
+    { check:'Google Business Profile claimed & verified', status:'pass', detail:'Verified, actively posting' },
+    { check:'NAP consistency (Name/Address/Phone)', status:'pass', detail:'Matches across GBP, website, and directories' },
+    { check:'Business hours accuracy', status:'pass', detail:'M–F 4:30AM–12AM, Sat–Sun 6AM–9PM confirmed current' },
+    { check:'Review response rate', status:'warn', detail:'62% of reviews responded to — aim for 90%+' },
+    { check:'Photos updated in last 90 days', status:'pass', detail:'Last upload 12 days ago' },
+    { check:'Website schema markup (LocalBusiness)', status:'fail', detail:'Not detected — add structured data for richer search results' },
+  ]);
+
+  // --- Creative tool connections (Canva / Google Drive) ---
+  DB.set('creativeConnections', { canva:false, drive:false });
 
   // --- Expanded social stats (matches real 8-platform planner) ---
   DB.set('socialStats', {
@@ -1973,6 +2158,73 @@ function renderReviews(){
 }
 
 /* =========================================================
+   MARKETING REPORTS — Attribution, Calls, Appointments, Local Audit
+   ========================================================= */
+function setReportsTab(tab){
+  document.querySelectorAll('#reports-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#reports-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['attribution','calls','appointments','audit'].forEach(t=>{
+    document.getElementById('report-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+function renderAttributionReport(){
+  const rows = DB.get('attributionReport',[]);
+  document.getElementById('attribution-chart').innerHTML = barChart(
+    rows.map(r=>r.source.split(' ')[0]), rows.map(r=>r.leads), {color:'#c9a08f', height:180}
+  );
+  document.getElementById('attribution-tbody').innerHTML = rows.map(r=>{
+    const cpl = r.leads ? (r.cost / r.leads) : 0;
+    return `<tr>
+      <td>${r.source}</td><td>${r.leads}</td><td>${r.opportunities}</td><td>${r.won}</td>
+      <td>${r.cost ? fmtMoney(r.cost) : 'Free'}</td>
+      <td class="muted">${r.cost ? fmtMoney(cpl) : '—'}</td>
+    </tr>`;
+  }).join('');
+}
+function renderCallReport(){
+  const calls = DB.get('callReport',[]);
+  const inbound = calls.filter(c=>c.direction==='Inbound').length;
+  document.getElementById('calls-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Calls</div><div class="val">${calls.length}</div></div>
+    <div class="kpi"><div class="lbl">Inbound</div><div class="val">${inbound}</div></div>
+    <div class="kpi"><div class="lbl">Booked from Calls</div><div class="val">${calls.filter(c=>c.outcome==='Booked Tour').length}</div></div>
+    <div class="kpi"><div class="lbl">Missed / No Answer</div><div class="val">${calls.filter(c=>c.outcome==='No Answer').length}</div></div>
+  `;
+  document.getElementById('calls-tbody').innerHTML = calls.map(c=>`
+    <tr><td>${c.caller}</td><td class="muted">${c.number}</td><td>${c.direction}</td><td>${c.duration}</td>
+    <td><span class="pill ${c.outcome==='Booked Tour'?'pill-member':(c.outcome==='No Answer'?'pill-lost':'pill-contacted')}">${c.outcome}</span></td>
+    <td class="muted">${fmtDate(c.date)}</td></tr>
+  `).join('');
+}
+function renderAppointmentReport(){
+  const appts = DB.get('appointmentReport',[]);
+  document.getElementById('appt-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Appointments</div><div class="val">${appts.length}</div></div>
+    <div class="kpi"><div class="lbl">Confirmed</div><div class="val">${appts.filter(a=>a.status==='confirmed').length}</div></div>
+    <div class="kpi"><div class="lbl">Completed</div><div class="val">${appts.filter(a=>a.status==='completed').length}</div></div>
+    <div class="kpi"><div class="lbl">No-Shows</div><div class="val">${appts.filter(a=>a.status==='no-show').length}</div></div>
+  `;
+  document.getElementById('appt-tbody').innerHTML = appts.map(a=>{
+    const pill = a.status==='confirmed' ? 'pill-tour' : (a.status==='completed' ? 'pill-member' : 'pill-lost');
+    return `<tr><td>${a.name}</td><td>${a.type}</td><td class="muted">${a.staff}</td><td class="muted">${fmtDate(a.date)}</td><td><span class="pill ${pill}">${a.status}</span></td></tr>`;
+  }).join('');
+}
+function renderLocalAudit(){
+  const rows = DB.get('localAuditReport',[]);
+  document.getElementById('audit-tbody').innerHTML = rows.map(r=>{
+    const pill = r.status==='pass' ? 'pill-member' : (r.status==='warn' ? 'pill-due' : 'pill-overdue');
+    const label = r.status==='pass' ? 'Pass' : (r.status==='warn' ? 'Needs Attention' : 'Fail');
+    return `<tr><td>${r.check}</td><td><span class="pill ${pill}">${label}</span></td><td class="muted">${r.detail}</td></tr>`;
+  }).join('');
+}
+function renderReports(){
+  renderAttributionReport();
+  renderCallReport();
+  renderAppointmentReport();
+  renderLocalAudit();
+}
+
+/* =========================================================
    SEO STRATEGY
    ========================================================= */
 function renderSEO(){
@@ -2551,7 +2803,22 @@ function renderSocialHistory(){
   `).join('') || '<tr><td colspan="5" class="muted" style="padding:20px;">No posts yet.</td></tr>';
 }
 
-function renderMedia(){ renderMediaGrid(); }
+function toggleCreativeConnection(tool){
+  const conns = DB.get('creativeConnections', {});
+  conns[tool] = !conns[tool];
+  DB.set('creativeConnections', conns);
+  renderCreativeConnections();
+  const label = tool==='canva' ? 'Canva' : 'Google Drive';
+  toast(conns[tool] ? `Connected to ${label}.` : `Disconnected from ${label}.`);
+}
+function renderCreativeConnections(){
+  const conns = DB.get('creativeConnections', {});
+  const canvaBtn = document.getElementById('canva-connect-btn');
+  const driveBtn = document.getElementById('drive-connect-btn');
+  if(canvaBtn) canvaBtn.textContent = conns.canva ? 'Canva Connected ✓' : 'Connect Canva';
+  if(driveBtn) driveBtn.textContent = conns.drive ? 'Google Drive Connected ✓' : 'Connect Google Drive';
+}
+function renderMedia(){ renderMediaGrid(); renderCreativeConnections(); }
 function renderSocial(){ renderSocialConnections(); renderMediaGrid(); renderSocialHistory(); renderSocialStats(); }
 
 /* =========================================================
@@ -2563,6 +2830,7 @@ const RENDERERS = {
   leads: renderLeads,
   reps: renderReps,
   marketing: renderMarketing,
+  reports: renderReports,
   analytics: renderAnalytics,
   seo: renderSEO,
   members: renderMembers,
