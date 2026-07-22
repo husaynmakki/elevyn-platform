@@ -224,7 +224,10 @@ tr:hover td{background:rgba(255,255,255,0.015);}
   <div class="nav-group">
     <div class="nav-label">Growth</div>
     <div class="nav-item" data-page="conversations"><span class="ic">&#128172;</span><span class="lbl">Conversations</span></div>
+    <div class="nav-item" data-page="contacts"><span class="ic">&#128101;</span><span class="lbl">Contacts</span></div>
     <div class="nav-item" data-page="leads"><span class="ic">&#9737;</span><span class="lbl">Leads</span></div>
+    <div class="nav-item" data-page="primarymembers"><span class="ic">&#127942;</span><span class="lbl">Primary Members</span></div>
+    <div class="nav-item" data-page="calendar"><span class="ic">&#128197;</span><span class="lbl">Calendar</span></div>
     <div class="nav-item" data-page="reps"><span class="ic">&#9787;</span><span class="lbl">Sales Reps</span></div>
     <div class="nav-item" data-page="marketing"><span class="ic">&#9993;</span><span class="lbl">Marketing</span></div>
     <div class="nav-item" data-page="reports"><span class="ic">&#128202;</span><span class="lbl">Marketing Reports</span></div>
@@ -313,6 +316,27 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     </div>
   </div>
 
+  <!-- CONTACTS -->
+  <div class="page" id="page-contacts">
+    <div class="topbar">
+      <div><h1>Contacts</h1><div class="sub">The full contact database — everyone who's ever reached out, not just active leads</div></div>
+      <div class="topbar-actions">
+        <button class="btn" onclick="exportContactsCSV()">Export CSV</button>
+        <button class="btn btn-solid" onclick="openContactModal()">+ Add Contact</button>
+      </div>
+    </div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="flex-between" style="margin-bottom:16px;">
+        <div class="muted"><b id="contacts-total-count">0</b> Contacts</div>
+        <input type="text" id="contacts-search" placeholder="Search by name, phone, or email" oninput="renderContacts()" style="width:280px;">
+      </div>
+      <div class="panel">
+        <table><thead><tr><th>Contact Name</th><th>Phone</th><th>Email</th><th>Business Name</th><th>Created</th><th>Last Activity</th><th>Tags</th></tr></thead><tbody id="contacts-tbody"></tbody></table>
+      </div>
+      <p class="small-note">This is the broader contact list (matches your CRM's "Contacts" concept — everyone in the system) — separate from the Leads pipeline, which tracks only active sales opportunities.</p>
+    </div>
+  </div>
+
   <!-- LEADS -->
   <div class="page" id="page-leads">
     <div class="topbar">
@@ -344,6 +368,36 @@ tr:hover td{background:rgba(255,255,255,0.015);}
       </div>
       <div id="leads-kanban-wrap"></div>
       <p class="small-note">"Find New Leads" simulates a sweep of connected sources (site forms, chat widget, ad platforms). Wiring this to real sources means webhooks from your form provider and ad accounts feeding into this same lead table.</p>
+    </div>
+  </div>
+
+  <!-- PRIMARY MEMBERS PIPELINE -->
+  <div class="page" id="page-primarymembers">
+    <div class="topbar">
+      <div><h1>Primary Members</h1><div class="sub">The membership-type pipeline — New Lead through Won, by household type</div></div>
+      <div class="topbar-actions"><button class="btn btn-solid" onclick="openPmModal()">+ Add to Pipeline</button></div>
+    </div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="kpi-row" id="pm-kpi-row" style="grid-template-columns:repeat(4,1fr);"></div>
+      <div id="pm-kanban-wrap"></div>
+      <p class="small-note">This pipeline mirrors your CRM's actual funnel stages (New Lead → Single / Couple / Family → Joined the Club → Won) — separate from the general Leads pipeline above, which tracks broader sales stages.</p>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="page" id="page-calendar">
+    <div class="topbar"><div><h1>Calendar</h1><div class="sub">Week view across every bookable calendar — club, staff, and marketing team</div></div></div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="flex-between" style="margin-bottom:16px;">
+        <div class="chip-row" id="calendar-filter-row"></div>
+        <div class="chip-row">
+          <button class="btn btn-sm" onclick="shiftCalendarWeek(-1)">&larr; Prev Week</button>
+          <button class="btn btn-sm" onclick="shiftCalendarWeek(1)">Next Week &rarr;</button>
+        </div>
+      </div>
+      <div class="panel" style="overflow-x:auto;">
+        <div id="calendar-grid" style="min-width:820px;"></div>
+      </div>
     </div>
   </div>
 
@@ -494,7 +548,10 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="vtab active" data-v="attribution" onclick="setReportsTab('attribution')">Attribution</button>
         <button class="vtab" data-v="calls" onclick="setReportsTab('calls')">Call Report</button>
         <button class="vtab" data-v="appointments" onclick="setReportsTab('appointments')">Appointments</button>
+        <button class="vtab" data-v="googleads" onclick="setReportsTab('googleads')">Google Ads</button>
+        <button class="vtab" data-v="metaads" onclick="setReportsTab('metaads')">Meta Ads</button>
         <button class="vtab" data-v="audit" onclick="setReportsTab('audit')">Local Marketing Audit</button>
+        <button class="vtab" data-v="builder" onclick="setReportsTab('builder')">Custom Report Builder</button>
       </div>
 
       <div id="report-attribution">
@@ -525,6 +582,40 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <div class="panel">
           <div class="panel-head"><h3>Local Marketing Audit</h3><div class="muted">Google Business Profile &amp; local listing health</div></div>
           <table><thead><tr><th>Check</th><th>Status</th><th>Detail</th></tr></thead><tbody id="audit-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-googleads" style="display:none;">
+        <div class="kpi-row" id="googleads-kpi-row" style="grid-template-columns:repeat(4,1fr);"></div>
+        <div class="panel">
+          <table><thead><tr><th>Campaign</th><th>Clicks</th><th>Impressions</th><th>Spend</th><th>Conversions</th><th>Cost / Conversion</th></tr></thead><tbody id="googleads-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-metaads" style="display:none;">
+        <div class="kpi-row" id="metaads-kpi-row" style="grid-template-columns:repeat(4,1fr);"></div>
+        <div class="panel">
+          <table><thead><tr><th>Campaign</th><th>Platform</th><th>Reach</th><th>Spend</th><th>Leads</th><th>Cost / Lead</th></tr></thead><tbody id="metaads-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="report-builder" style="display:none;">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>Available Widgets</h3></div>
+            <div class="panel-body" id="builder-widget-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <input type="text" id="builder-report-name" value="Untitled Report" style="border:none;background:transparent;font-size:15px;font-weight:600;color:var(--ink);width:60%;">
+              <button class="btn btn-sm btn-solid" onclick="saveCustomReport()">Save Report</button>
+            </div>
+            <div class="panel-body" id="builder-canvas" style="min-height:220px;display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Saved Reports</h3></div>
+          <table><thead><tr><th>Report Name</th><th>Widgets</th><th>Created</th><th></th></tr></thead><tbody id="saved-reports-tbody"></tbody></table>
         </div>
       </div>
     </div>
@@ -595,6 +686,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="vtab" data-v="coupons" onclick="setPaymentsTab('coupons')">Coupons</button>
         <button class="vtab" data-v="giftcards" onclick="setPaymentsTab('giftcards')">Gift Cards</button>
         <button class="vtab" data-v="products" onclick="setPaymentsTab('products')">Products</button>
+        <button class="vtab" data-v="documents" onclick="setPaymentsTab('documents')">Documents &amp; Contracts</button>
       </div>
 
       <div id="payments-links">
@@ -623,6 +715,14 @@ tr:hover td{background:rgba(255,255,255,0.015);}
           <div class="panel-head"><h3>Products</h3></div>
           <table><thead><tr><th>Product</th><th>Type</th><th>Price</th></tr></thead><tbody id="payment-products-tbody"></tbody></table>
         </div>
+      </div>
+
+      <div id="payments-documents" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Documents &amp; Contracts</h3><button class="btn btn-sm btn-solid" onclick="openDocumentModal()">+ New Document</button></div>
+          <table><thead><tr><th>Document</th><th>Recipient</th><th>Type</th><th>Status</th><th>Sent</th></tr></thead><tbody id="documents-tbody"></tbody></table>
+        </div>
+        <p class="small-note">Sending a document logs it here as "Sent." Actually collecting a real e-signature requires an e-signature provider (like the one built into GoldCore, or DocuSign/HelloSign) connected on a backend.</p>
       </div>
     </div>
   </div>
@@ -866,6 +966,67 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 <div class="toast" id="toast"></div>
 
 <!-- LEAD MODAL -->
+<!-- DOCUMENT MODAL -->
+<div class="modal-scrim" id="document-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Document</h3><button class="modal-close" onclick="closeDocumentModal()">&times;</button></div>
+    <form id="document-form" onsubmit="saveDocument(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Document Name</label><input id="doc-name" placeholder="e.g. Membership Agreement" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Recipient</label><input id="doc-recipient" required></div>
+          <div class="form-field"><label>Type</label>
+            <select id="doc-type"><option>Membership Agreement</option><option>Waiver</option><option>Personal Training Contract</option><option>Corporate Agreement</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeDocumentModal()">Cancel</button><button type="submit" class="btn btn-solid">Send for Signature</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- PRIMARY MEMBER MODAL -->
+<div class="modal-scrim" id="pm-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add to Primary Members Pipeline</h3><button class="modal-close" onclick="closePmModal()">&times;</button></div>
+    <form id="pm-form" onsubmit="savePm(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="pm-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Household Type</label>
+            <select id="pm-type"><option value="Single">Single</option><option value="Couple">Couple</option><option value="Family">Family</option></select>
+          </div>
+          <div class="form-field"><label>Stage</label>
+            <select id="pm-stage">
+              <option value="new-lead">New Lead</option><option value="household">Single/Couple/Family</option>
+              <option value="joined">Joined the Club</option><option value="won">Won</option><option value="lost">Lost/Abandoned</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closePmModal()">Cancel</button><button type="submit" class="btn btn-solid">Add to Pipeline</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-scrim" id="contact-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add Contact</h3><button class="modal-close" onclick="closeContactModal()">&times;</button></div>
+    <form id="contact-form" onsubmit="saveContact(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="ct-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Phone</label><input id="ct-phone"></div>
+          <div class="form-field"><label>Email</label><input id="ct-email" type="email"></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Business Name (optional)</label><input id="ct-business"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeContactModal()">Cancel</button><button type="submit" class="btn btn-solid">Save Contact</button></div>
+    </form>
+  </div>
+</div>
+
 <div class="modal-scrim" id="lead-modal">
   <div class="modal">
     <div class="modal-head"><h3 id="lead-modal-title">Add Lead</h3><button class="modal-close" onclick="closeLeadModal()">&times;</button></div>
@@ -1413,6 +1574,89 @@ function seedIfEmpty(){
     studios: { heroHeadline:"Worn in the studio. Styled after.", heroSub:"Cotton essentials, merino wool layers, and performance pieces.", tourCta:"Shop New Arrivals" }
   });
 
+  // --- Contacts (broader database than Leads) ---
+  const CONTACT_BUSINESS = ['', '', '', 'Lapointe Consultants', '', 'Toyota of Dearborn', '', '', 'Shehada Sales Group', ''];
+  const contacts = [];
+  for(let i=0;i<40;i++){
+    const name = FIRST[(i*7)%FIRST.length] + ' ' + LAST[(i*4)%LAST.length];
+    contacts.push({
+      id: uid('ct'), name,
+      phone: '(313) '+Math.floor(200+Math.random()*799)+'-'+String(1000+Math.floor(Math.random()*8999)).slice(0,4),
+      email: name.toLowerCase().replace(' ','.')+'@gmail.com',
+      business: CONTACT_BUSINESS[i % CONTACT_BUSINESS.length],
+      createdAt: new Date(Date.now() - Math.floor(Math.random()*200)*86400000).toISOString(),
+      lastActivity: new Date(Date.now() - Math.floor(Math.random()*60)*86400000).toISOString(),
+      tags: Math.random() > 0.6 ? ['Newsletter'] : [],
+    });
+  }
+  DB.set('contacts', contacts);
+  DB.set('contactsTotalKnown', 596); // matches the real system's total; only a working sample is seeded here
+
+  // --- Primary Members pipeline (New Lead -> Single/Couple/Family -> Joined -> Won) ---
+  const PM_STAGES = ['new-lead','household','joined','won','lost'];
+  const HOUSEHOLD_TYPES = ['Single','Couple','Family'];
+  const primaryMembers = [];
+  for(let i=0;i<14;i++){
+    const name = FIRST[(i*3)%FIRST.length] + ' ' + LAST[(i*6)%LAST.length];
+    primaryMembers.push({
+      id: uid('pmb'), name,
+      householdType: HOUSEHOLD_TYPES[i % HOUSEHOLD_TYPES.length],
+      stage: PM_STAGES[Math.min(i % (PM_STAGES.length+2), PM_STAGES.length-1)],
+      createdAt: new Date(Date.now() - Math.floor(Math.random()*60)*86400000).toISOString(),
+    });
+  }
+  DB.set('primaryMembers', primaryMembers);
+
+  // --- Calendar events (club + staff calendars) ---
+  const CAL_STAFF = ['Dearborn Racquet Health Club','Ahmed — Website & SEO','Mary — SMM','Taylor — SMM'];
+  const calendarEvents = [];
+  const apptsForCal = DB.get('appointmentReport', []);
+  apptsForCal.forEach((a,i)=>{
+    calendarEvents.push({
+      id: uid('cal'), title: a.name + ' — ' + a.type, staff: CAL_STAFF[0],
+      date: a.date, hour: 9 + (i*2)%10,
+    });
+  });
+  calendarEvents.push(
+    { id: uid('cal'), title:'SEO content review', staff: CAL_STAFF[1], date: new Date().toISOString(), hour: 11 },
+    { id: uid('cal'), title:'Social content shoot', staff: CAL_STAFF[2], date: new Date(Date.now()+86400000).toISOString(), hour: 14 },
+    { id: uid('cal'), title:'Post scheduling block', staff: CAL_STAFF[3], date: new Date(Date.now()+2*86400000).toISOString(), hour: 10 },
+  );
+  DB.set('calendarEvents', calendarEvents);
+  DB.set('calendarStaffFilter', 'all');
+  DB.set('calendarWeekOffset', 0);
+
+  // --- Documents & Contracts ---
+  DB.set('documents', [
+    { id: uid('doc'), name:'Membership Agreement', recipient:'Leila Chokr', type:'Membership Agreement', status:'signed', sentAt: new Date(Date.now()-5*86400000).toISOString() },
+    { id: uid('doc'), name:'Liability Waiver', recipient:'Karim Odom', type:'Waiver', status:'sent', sentAt: new Date(Date.now()-2*86400000).toISOString() },
+    { id: uid('doc'), name:'PT Package Contract', recipient:'Priya Foster', type:'Personal Training Contract', status:'draft', sentAt: new Date().toISOString() },
+  ]);
+
+  // --- Google Ads / Meta Ads reports ---
+  DB.set('googleAdsReport', [
+    { campaign:'Search — Gym Near Me', clicks:412, impressions:8900, spend:610, conversions:18 },
+    { campaign:'Search — Personal Training', clicks:188, impressions:3400, spend:240, conversions:7 },
+    { campaign:'Display — Retargeting', clicks:96, impressions:21000, spend:110, conversions:3 },
+  ]);
+  DB.set('metaAdsReport', [
+    { campaign:'Instagram — Tour Booking Push', platform:'Instagram', reach:14200, spend:420, leads:26 },
+    { campaign:"Facebook — Women's Studio Launch", platform:'Facebook', reach:9800, spend:180, leads:11 },
+    { campaign:'Instagram — Kids Club Awareness', platform:'Instagram', reach:6100, spend:95, leads:6 },
+  ]);
+
+  // --- Custom Report Builder ---
+  DB.set('reportWidgetDefs', [
+    { id:'opportunity-status', name:'Opportunity Status', desc:'Open / Won / Lost breakdown' },
+    { id:'pipeline', name:'Pipeline', desc:'Funnel by stage' },
+    { id:'conversion-rate', name:'Conversion Rate', desc:'Overall lead-to-member rate' },
+    { id:'lead-report', name:'Lead Report', desc:'Leads by source and volume' },
+    { id:'stages-distribution', name:'Stages Distribution', desc:'Donut chart of pipeline stages' },
+    { id:'revenue-summary', name:'Revenue Summary', desc:'MRR and category breakdown' },
+  ]);
+  DB.set('customReportDraft', []);
+  DB.set('savedReports', []);
+
   DB.set('seeded', true);
 }
 seedIfEmpty();
@@ -1618,6 +1862,173 @@ function sendConvoReply(){
   openConvoThread(activeConvoId);
   toast('Reply logged — connect Twilio/SendGrid to actually deliver.');
 }
+
+/* =========================================================
+   CONTACTS — the broader contact database (separate from Leads)
+   ========================================================= */
+function renderContacts(){
+  const contacts = DB.get('contacts',[]);
+  const totalKnown = DB.get('contactsTotalKnown', contacts.length);
+  const q = (document.getElementById('contacts-search')||{}).value?.toLowerCase().trim() || '';
+  const filtered = q ? contacts.filter(c =>
+    c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.includes(q)
+  ) : contacts;
+  document.getElementById('contacts-total-count').textContent = totalKnown.toLocaleString();
+  document.getElementById('contacts-tbody').innerHTML = filtered.map(c=>`
+    <tr>
+      <td><span class="avatar">${initials(c.name)}</span>${c.name}</td>
+      <td class="muted">${c.phone}</td>
+      <td class="muted">${c.email}</td>
+      <td class="muted">${c.business || '—'}</td>
+      <td class="muted">${fmtDate(c.createdAt)}</td>
+      <td class="muted">${fmtDate(c.lastActivity)}</td>
+      <td>${c.tags.map(t=>`<span class="pill pill-contacted">${t}</span>`).join(' ')}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="7" class="muted" style="padding:20px;">No contacts match.</td></tr>';
+}
+function openContactModal(){ document.getElementById('contact-form').reset(); document.getElementById('contact-modal').classList.add('open'); }
+function closeContactModal(){ document.getElementById('contact-modal').classList.remove('open'); }
+function saveContact(e){
+  e.preventDefault();
+  const contacts = DB.get('contacts',[]);
+  contacts.unshift({
+    id: uid('ct'),
+    name: document.getElementById('ct-name').value.trim(),
+    phone: document.getElementById('ct-phone').value.trim(),
+    email: document.getElementById('ct-email').value.trim(),
+    business: document.getElementById('ct-business').value.trim(),
+    createdAt: new Date().toISOString(), lastActivity: new Date().toISOString(), tags:[],
+  });
+  DB.set('contacts', contacts);
+  DB.set('contactsTotalKnown', DB.get('contactsTotalKnown', contacts.length) + 1);
+  closeContactModal();
+  renderContacts();
+  toast('Contact added.');
+}
+function exportContactsCSV(){
+  const contacts = DB.get('contacts',[]);
+  const csv = toCSV(contacts, [
+    { label:'Name', value:'name' }, { label:'Phone', value:'phone' }, { label:'Email', value:'email' },
+    { label:'Business Name', value:'business' }, { label:'Created', value: c=>fmtDate(c.createdAt) },
+    { label:'Last Activity', value: c=>fmtDate(c.lastActivity) },
+  ]);
+  downloadFile('elevyn-contacts.csv', csv, 'text/csv');
+  toast(`Exported ${contacts.length} contacts to CSV.`);
+}
+
+/* =========================================================
+   PRIMARY MEMBERS PIPELINE — New Lead -> Single/Couple/Family -> Joined -> Won
+   ========================================================= */
+const PM_STAGE_LABELS = { 'new-lead':'New Lead', 'household':'Single / Couple / Family', 'joined':'Joined the Club', 'won':'Won', 'lost':'Lost / Abandoned' };
+function renderPmKanban(){
+  const members = DB.get('primaryMembers',[]);
+  const stages = Object.keys(PM_STAGE_LABELS);
+  document.getElementById('pm-kanban-wrap').innerHTML = `<div class="pipeline" style="grid-template-columns:repeat(5,1fr);">` + stages.map(st=>{
+    const inStage = members.filter(m=>m.stage===st);
+    return `<div class="pipe-col" data-stage="${st}">
+      <div class="pipe-col-head">${PM_STAGE_LABELS[st]} <span class="count">${inStage.length}</span></div>
+      ${inStage.map(m=>`
+        <div class="pipe-card" draggable="true" data-pm="${m.id}" ondragstart="dragPm(event)">
+          <div class="nm">${m.name}</div>
+          <div class="meta">${m.householdType}</div>
+        </div>`).join('')}
+    </div>`;
+  }).join('') + `</div>`;
+
+  document.querySelectorAll('#pm-kanban-wrap .pipe-col').forEach(col=>{
+    col.addEventListener('dragover', e=> e.preventDefault());
+    col.addEventListener('drop', e=>{
+      e.preventDefault();
+      const pmId = e.dataTransfer.getData('text/plain');
+      const members = DB.get('primaryMembers',[]);
+      const m = members.find(x=>x.id===pmId);
+      if(m){ m.stage = col.dataset.stage; DB.set('primaryMembers', members); renderPrimaryMembers(); toast(m.name+' moved to '+PM_STAGE_LABELS[col.dataset.stage]); }
+    });
+  });
+}
+function dragPm(e){ e.dataTransfer.setData('text/plain', e.target.dataset.pm); }
+function openPmModal(){ document.getElementById('pm-form').reset(); document.getElementById('pm-modal').classList.add('open'); }
+function closePmModal(){ document.getElementById('pm-modal').classList.remove('open'); }
+function savePm(e){
+  e.preventDefault();
+  const members = DB.get('primaryMembers',[]);
+  members.push({
+    id: uid('pmb'),
+    name: document.getElementById('pm-name').value.trim(),
+    householdType: document.getElementById('pm-type').value,
+    stage: document.getElementById('pm-stage').value,
+    createdAt: new Date().toISOString(),
+  });
+  DB.set('primaryMembers', members);
+  closePmModal();
+  renderPrimaryMembers();
+  toast('Added to Primary Members pipeline.');
+}
+function renderPrimaryMembers(){
+  const members = DB.get('primaryMembers',[]);
+  const won = members.filter(m=>m.stage==='won').length;
+  document.getElementById('pm-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total in Pipeline</div><div class="val">${members.length}</div></div>
+    <div class="kpi"><div class="lbl">Won</div><div class="val">${won}</div></div>
+    <div class="kpi"><div class="lbl">Families</div><div class="val">${members.filter(m=>m.householdType==='Family').length}</div></div>
+    <div class="kpi"><div class="lbl">Conversion Rate</div><div class="val">${members.length ? ((won/members.length)*100).toFixed(1) : '0.0'}%</div></div>
+  `;
+  renderPmKanban();
+}
+
+/* =========================================================
+   CALENDAR — week grid across club + staff calendars
+   ========================================================= */
+function renderCalendarFilters(){
+  const staffList = ['all','Dearborn Racquet Health Club','Ahmed — Website & SEO','Mary — SMM','Taylor — SMM'];
+  const current = DB.get('calendarStaffFilter','all');
+  document.getElementById('calendar-filter-row').innerHTML = staffList.map(s=>`
+    <button class="chip${s===current?' sel':''}" onclick="setCalendarFilter('${s}')">${s==='all'?'All Calendars':s}</button>
+  `).join('');
+}
+function setCalendarFilter(staff){
+  DB.set('calendarStaffFilter', staff);
+  renderCalendarFilters();
+  renderCalendarGrid();
+}
+function shiftCalendarWeek(dir){
+  DB.set('calendarWeekOffset', DB.get('calendarWeekOffset',0) + dir);
+  renderCalendarGrid();
+}
+function renderCalendarGrid(){
+  const offset = DB.get('calendarWeekOffset', 0);
+  const filter = DB.get('calendarStaffFilter', 'all');
+  const events = DB.get('calendarEvents', []).filter(e => filter==='all' || e.staff===filter);
+
+  const today = new Date();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((today.getDay()+6)%7) + (offset*7));
+  const days = Array.from({length:7}, (_,i)=>{
+    const d = new Date(monday); d.setDate(monday.getDate()+i); return d;
+  });
+
+  let grid = `<div style="display:grid;grid-template-columns:60px repeat(7,1fr);gap:1px;background:var(--line);">`;
+  grid += `<div style="background:var(--panel);padding:8px;"></div>`;
+  days.forEach(d=>{
+    grid += `<div style="background:var(--panel);padding:8px;text-align:center;font-size:11.5px;font-weight:600;">${d.toLocaleDateString('en-US',{weekday:'short'})}<br><span class="muted">${d.getMonth()+1}/${d.getDate()}</span></div>`;
+  });
+  for(let hour=8; hour<=18; hour++){
+    grid += `<div style="background:var(--panel);padding:8px;font-size:10.5px;color:var(--off);">${hour>12?hour-12:hour}${hour>=12?'PM':'AM'}</div>`;
+    days.forEach(d=>{
+      const dayEvents = events.filter(e=>{
+        const ed = new Date(e.date);
+        return ed.toDateString()===d.toDateString() && e.hour===hour;
+      });
+      grid += `<div style="background:var(--panel-2);padding:4px;min-height:44px;">${dayEvents.map(e=>`
+        <div style="background:var(--rose);color:#0c0d10;border-radius:4px;padding:4px 6px;font-size:10px;margin-bottom:2px;">${e.title}</div>
+      `).join('')}</div>`;
+    });
+  }
+  grid += `</div>`;
+  document.getElementById('calendar-grid').innerHTML = grid;
+}
+function renderCalendar(){ renderCalendarFilters(); renderCalendarGrid(); }
+
 function renderConversations(){
   renderConvoList();
   const convos = DB.get('conversations',[]);
@@ -2163,7 +2574,7 @@ function renderReviews(){
 function setReportsTab(tab){
   document.querySelectorAll('#reports-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#reports-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  ['attribution','calls','appointments','audit'].forEach(t=>{
+  ['attribution','calls','appointments','googleads','metaads','audit','builder'].forEach(t=>{
     document.getElementById('report-'+t).style.display = (t===tab) ? '' : 'none';
   });
 }
@@ -2217,11 +2628,172 @@ function renderLocalAudit(){
     return `<tr><td>${r.check}</td><td><span class="pill ${pill}">${label}</span></td><td class="muted">${r.detail}</td></tr>`;
   }).join('');
 }
+
+/* ---------- Google Ads report ---------- */
+function renderGoogleAdsReport(){
+  const rows = DB.get('googleAdsReport',[]);
+  const totalSpend = rows.reduce((s,r)=>s+r.spend,0);
+  const totalConv = rows.reduce((s,r)=>s+r.conversions,0);
+  document.getElementById('googleads-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Spend</div><div class="val">${fmtMoney(totalSpend)}</div></div>
+    <div class="kpi"><div class="lbl">Total Clicks</div><div class="val">${rows.reduce((s,r)=>s+r.clicks,0).toLocaleString()}</div></div>
+    <div class="kpi"><div class="lbl">Conversions</div><div class="val">${totalConv}</div></div>
+    <div class="kpi"><div class="lbl">Avg. Cost / Conversion</div><div class="val">${totalConv ? fmtMoney(totalSpend/totalConv) : '—'}</div></div>
+  `;
+  document.getElementById('googleads-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.campaign}</td><td>${r.clicks.toLocaleString()}</td><td>${r.impressions.toLocaleString()}</td>
+    <td>${fmtMoney(r.spend)}</td><td>${r.conversions}</td><td class="muted">${r.conversions ? fmtMoney(r.spend/r.conversions) : '—'}</td></tr>
+  `).join('');
+}
+
+/* ---------- Meta Ads report ---------- */
+function renderMetaAdsReport(){
+  const rows = DB.get('metaAdsReport',[]);
+  const totalSpend = rows.reduce((s,r)=>s+r.spend,0);
+  const totalLeads = rows.reduce((s,r)=>s+r.leads,0);
+  document.getElementById('metaads-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Spend</div><div class="val">${fmtMoney(totalSpend)}</div></div>
+    <div class="kpi"><div class="lbl">Total Reach</div><div class="val">${rows.reduce((s,r)=>s+r.reach,0).toLocaleString()}</div></div>
+    <div class="kpi"><div class="lbl">Leads</div><div class="val">${totalLeads}</div></div>
+    <div class="kpi"><div class="lbl">Avg. Cost / Lead</div><div class="val">${totalLeads ? fmtMoney(totalSpend/totalLeads) : '—'}</div></div>
+  `;
+  document.getElementById('metaads-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.campaign}</td><td class="muted">${r.platform}</td><td>${r.reach.toLocaleString()}</td>
+    <td>${fmtMoney(r.spend)}</td><td>${r.leads}</td><td class="muted">${r.leads ? fmtMoney(r.spend/r.leads) : '—'}</td></tr>
+  `).join('');
+}
+
+/* ---------- Custom Report Builder ---------- */
+function renderBuilderWidgetList(){
+  const defs = DB.get('reportWidgetDefs',[]);
+  const draft = DB.get('customReportDraft',[]);
+  document.getElementById('builder-widget-list').innerHTML = defs.map(w=>{
+    const added = draft.includes(w.id);
+    return `<div class="panel" style="padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
+      <div><b style="font-size:13px;">${w.name}</b><div class="muted" style="font-size:11.5px;">${w.desc}</div></div>
+      <button class="btn btn-sm ${added?'btn-danger':'btn-solid'}" onclick="toggleBuilderWidget('${w.id}')">${added?'Remove':'Add'}</button>
+    </div>`;
+  }).join('');
+}
+function toggleBuilderWidget(widgetId){
+  let draft = DB.get('customReportDraft',[]);
+  if(draft.includes(widgetId)){ draft = draft.filter(id=>id!==widgetId); }
+  else { draft.push(widgetId); }
+  DB.set('customReportDraft', draft);
+  renderReportBuilder();
+}
+function widgetPreviewHTML(widgetId){
+  const defs = DB.get('reportWidgetDefs',[]);
+  const w = defs.find(d=>d.id===widgetId);
+  const leads = DB.get('leads',[]);
+  if(widgetId==='opportunity-status'){
+    const open = leads.filter(l=>!['member','lost'].includes(l.stage)).length;
+    const won = leads.filter(l=>l.stage==='member').length;
+    const lost = leads.filter(l=>l.stage==='lost').length;
+    return `<div><b>${w.name}</b><div class="muted" style="font-size:12.5px;margin-top:6px;">Open: ${open} · Won: ${won} · Lost: ${lost}</div></div>`;
+  }
+  if(widgetId==='pipeline'){
+    return `<div><b>${w.name}</b><div style="margin-top:8px;">${barChart(['New','Contact','Tour','Trial','Member'], [
+      leads.filter(l=>l.stage==='new').length, leads.filter(l=>l.stage==='contacted').length,
+      leads.filter(l=>l.stage==='tour').length, leads.filter(l=>l.stage==='trial').length,
+      leads.filter(l=>l.stage==='member').length,
+    ], {color:'#c9a08f', height:120})}</div></div>`;
+  }
+  if(widgetId==='conversion-rate'){
+    const rate = leads.length ? ((leads.filter(l=>l.stage==='member').length/leads.length)*100).toFixed(1) : '0.0';
+    return `<div><b>${w.name}</b><div class="muted" style="font-size:24px;margin-top:6px;color:var(--rose);">${rate}%</div></div>`;
+  }
+  if(widgetId==='lead-report'){
+    const bySource = {};
+    leads.forEach(l=>{ bySource[l.source] = (bySource[l.source]||0)+1; });
+    return `<div><b>${w.name}</b><div class="muted" style="font-size:12.5px;margin-top:6px;">${Object.entries(bySource).map(([s,n])=>`${s}: ${n}`).join(' · ')}</div></div>`;
+  }
+  if(widgetId==='stages-distribution'){
+    return `<div><b>${w.name}</b><div style="margin-top:8px;">${barChart(['New','Contact','Tour','Trial','Member','Lost'], [
+      leads.filter(l=>l.stage==='new').length, leads.filter(l=>l.stage==='contacted').length,
+      leads.filter(l=>l.stage==='tour').length, leads.filter(l=>l.stage==='trial').length,
+      leads.filter(l=>l.stage==='member').length, leads.filter(l=>l.stage==='lost').length,
+    ], {color:'#5b8fd9', height:120})}</div></div>`;
+  }
+  if(widgetId==='revenue-summary'){
+    const invoices = DB.get('invoices',[]);
+    const mrr = invoices.filter(i=>i.billingCycle==='monthly').reduce((s,i)=>s+i.amount,0);
+    return `<div><b>${w.name}</b><div class="muted" style="font-size:24px;margin-top:6px;color:var(--good);">${fmtMoney(mrr)}/mo</div></div>`;
+  }
+  return `<div><b>${w.name}</b></div>`;
+}
+function renderBuilderCanvas(){
+  const draft = DB.get('customReportDraft',[]);
+  document.getElementById('builder-canvas').innerHTML = draft.length
+    ? draft.map(id=>`<div class="panel" style="padding:14px;">${widgetPreviewHTML(id)}</div>`).join('')
+    : '<p class="muted" style="padding:30px 0;text-align:center;">Add widgets from the left to build your report.</p>';
+}
+function saveCustomReport(){
+  const draft = DB.get('customReportDraft',[]);
+  if(!draft.length){ toast('Add at least one widget first.'); return; }
+  const name = document.getElementById('builder-report-name').value.trim() || 'Untitled Report';
+  const saved = DB.get('savedReports',[]);
+  saved.push({ id: uid('rpt'), name, widgetCount: draft.length, createdAt: new Date().toISOString() });
+  DB.set('savedReports', saved);
+  DB.set('customReportDraft', []);
+  document.getElementById('builder-report-name').value = 'Untitled Report';
+  renderReportBuilder();
+  toast(`Report "${name}" saved.`);
+}
+function deleteSavedReport(id){
+  DB.set('savedReports', DB.get('savedReports',[]).filter(r=>r.id!==id));
+  renderReportBuilder();
+}
+function renderSavedReports(){
+  const saved = DB.get('savedReports',[]);
+  document.getElementById('saved-reports-tbody').innerHTML = saved.map(r=>`
+    <tr><td>${r.name}</td><td class="muted">${r.widgetCount} widgets</td><td class="muted">${fmtDate(r.createdAt)}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="deleteSavedReport('${r.id}')">Delete</button></td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No saved reports yet.</td></tr>';
+}
+function renderReportBuilder(){
+  renderBuilderWidgetList();
+  renderBuilderCanvas();
+  renderSavedReports();
+}
+
 function renderReports(){
   renderAttributionReport();
   renderCallReport();
   renderAppointmentReport();
+  renderGoogleAdsReport();
+  renderMetaAdsReport();
   renderLocalAudit();
+  renderReportBuilder();
+}
+
+/* =========================================================
+   DOCUMENTS & CONTRACTS
+   ========================================================= */
+function renderDocuments(){
+  const docs = DB.get('documents',[]);
+  document.getElementById('documents-tbody').innerHTML = docs.map(d=>{
+    const pill = d.status==='signed' ? 'pill-member' : (d.status==='sent' ? 'pill-tour' : 'pill-contacted');
+    return `<tr><td>${d.name}</td><td class="muted">${d.recipient}</td><td class="muted">${d.type}</td>
+    <td><span class="pill ${pill}">${d.status}</span></td><td class="muted">${fmtDate(d.sentAt)}</td></tr>`;
+  }).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No documents yet.</td></tr>';
+}
+function openDocumentModal(){ document.getElementById('document-form').reset(); document.getElementById('document-modal').classList.add('open'); }
+function closeDocumentModal(){ document.getElementById('document-modal').classList.remove('open'); }
+function saveDocument(e){
+  e.preventDefault();
+  const docs = DB.get('documents',[]);
+  docs.unshift({
+    id: uid('doc'),
+    name: document.getElementById('doc-name').value.trim(),
+    recipient: document.getElementById('doc-recipient').value.trim(),
+    type: document.getElementById('doc-type').value,
+    status: 'sent', sentAt: new Date().toISOString(),
+  });
+  DB.set('documents', docs);
+  closeDocumentModal();
+  renderDocuments();
+  toast('Document sent for signature.');
 }
 
 /* =========================================================
@@ -2463,7 +3035,7 @@ function savePaymentLink(e){
 function setPaymentsTab(tab){
   document.querySelectorAll('#payments-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#payments-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  ['links','coupons','giftcards','products'].forEach(t=>{
+  ['links','coupons','giftcards','products','documents'].forEach(t=>{
     document.getElementById('payments-'+t).style.display = (t===tab) ? '' : 'none';
   });
 }
@@ -2478,6 +3050,7 @@ function renderPayments(){
   renderCoupons();
   renderGiftCards();
   renderPaymentsProducts();
+  renderDocuments();
 }
 
 /* ---------- Marketing Team ---------- */
@@ -2827,7 +3400,10 @@ function renderSocial(){ renderSocialConnections(); renderMediaGrid(); renderSoc
 const RENDERERS = {
   dashboard: renderDashboard,
   conversations: renderConversations,
+  contacts: renderContacts,
   leads: renderLeads,
+  primarymembers: renderPrimaryMembers,
+  calendar: renderCalendar,
   reps: renderReps,
   marketing: renderMarketing,
   reports: renderReports,
