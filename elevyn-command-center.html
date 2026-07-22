@@ -148,7 +148,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 .pipe-card .meta{color:var(--off); font-size:11px;}
 
 /* ---------- TABS (view toggles) ---------- */
-.view-tabs{display:flex; gap:6px; margin-bottom:18px;}
+.view-tabs{display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap;}
 .vtab{padding:8px 16px; border-radius:6px; font-size:12.5px; border:1px solid var(--line); background:var(--panel-2); color:var(--off);}
 .vtab.active{background:var(--rose); color:#0c0d10; border-color:var(--rose); font-weight:600;}
 
@@ -394,6 +394,10 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="vtab" data-v="events" onclick="setCalendarPageTab('events')">Events</button>
         <button class="vtab" data-v="repeating" onclick="setCalendarPageTab('repeating')">Repeating Events</button>
         <button class="vtab" data-v="groups" onclick="setCalendarPageTab('groups')">Event Groups</button>
+        <button class="vtab" data-v="valuesummary" onclick="setCalendarPageTab('valuesummary')">Event Value Summary</button>
+        <button class="vtab" data-v="employeetracking" onclick="setCalendarPageTab('employeetracking')">Employee Tracking</button>
+        <button class="vtab" data-v="eventstats" onclick="setCalendarPageTab('eventstats')">Event Statistics</button>
+        <button class="vtab" data-v="closeout" onclick="setCalendarPageTab('closeout')">Schedule Close Out</button>
         <button class="vtab" data-v="enroll" onclick="setCalendarPageTab('enroll')">Member-Facing Enroll</button>
       </div>
 
@@ -431,6 +435,48 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         </div>
       </div>
 
+      <div id="calendar-tab-valuesummary" style="display:none;">
+        <div class="kpi-row" id="event-value-kpi-row" style="grid-template-columns:repeat(3,1fr);"></div>
+        <div class="panel">
+          <table><thead><tr><th>Event</th><th>Attendees</th><th>Revenue Generated</th></tr></thead><tbody id="event-value-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="calendar-tab-employeetracking" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Employee Tracking</h3></div>
+          <table><thead><tr><th>Employee</th><th>Clocked In</th><th>Clocked Out</th><th>Hours</th><th>Date</th></tr></thead><tbody id="employee-tracking-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="calendar-tab-eventstats" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Event Statistics</h3></div>
+          <div class="panel-body" id="event-stats-chart"></div>
+        </div>
+      </div>
+
+      <div id="calendar-tab-closeout" style="display:none;">
+        <div class="view-tabs" id="closeout-tabs">
+          <button class="vtab active" data-v="attendance" onclick="setCloseoutTab('attendance')">Attendance</button>
+          <button class="vtab" data-v="unbookedEmployee" onclick="setCloseoutTab('unbookedEmployee')">Unbooked Employee Events</button>
+          <button class="vtab" data-v="unbookedLocation" onclick="setCloseoutTab('unbookedLocation')">Unbooked Location Events</button>
+          <button class="vtab" data-v="unfunded" onclick="setCloseoutTab('unfunded')">Unfunded Events</button>
+        </div>
+        <div id="closeout-attendance">
+          <div class="panel"><table><thead><tr><th>Event</th><th>Expected</th><th>Attended</th><th>Date</th></tr></thead><tbody id="closeout-attendance-tbody"></tbody></table></div>
+        </div>
+        <div id="closeout-unbookedEmployee" style="display:none;">
+          <div class="panel"><table><thead><tr><th>Employee</th><th>Shift</th><th>Reason</th><th>Date</th></tr></thead><tbody id="closeout-unbooked-employee-tbody"></tbody></table></div>
+        </div>
+        <div id="closeout-unbookedLocation" style="display:none;">
+          <div class="panel"><table><thead><tr><th>Location</th><th>Time Slot</th><th>Reason</th><th>Date</th></tr></thead><tbody id="closeout-unbooked-location-tbody"></tbody></table></div>
+        </div>
+        <div id="closeout-unfunded" style="display:none;">
+          <div class="panel"><table><thead><tr><th>Event</th><th>Member</th><th>Amount Due</th><th>Date</th></tr></thead><tbody id="closeout-unfunded-tbody"></tbody></table></div>
+        </div>
+      </div>
+
       <div id="calendar-tab-enroll" style="display:none;">
         <div class="panel">
           <div class="panel-head"><h3>Member-Facing Enroll</h3></div>
@@ -443,21 +489,71 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 
   <!-- FRONT DESK CHECK-IN -->
   <div class="page" id="page-checkin">
-    <div class="topbar"><div><h1>Front Desk Check-In</h1><div class="sub">Search a member and check them in — mirrors the front-desk check-in flow</div></div></div>
+    <div class="topbar"><div><h1>Front Desk Check-In</h1><div class="sub">Search, check in, and monitor every check-in-related view</div></div></div>
     <div class="page-inner" style="padding:26px 30px;">
-      <div class="grid-2">
-        <div>
-          <div class="panel">
-            <div class="panel-head"><h3>Check In a Member</h3></div>
-            <div class="panel-body">
-              <input type="text" id="checkin-search" placeholder="Enter last name or barcode" oninput="renderCheckinSearch()" style="width:100%;margin-bottom:16px;">
-              <div id="checkin-search-results"></div>
+      <div class="view-tabs" id="checkin-page-tabs">
+        <button class="vtab active" data-v="search" onclick="setCheckinPageTab('search')">Check In</button>
+        <button class="vtab" data-v="attended" onclick="setCheckinPageTab('attended')">Attended</button>
+        <button class="vtab" data-v="unattended" onclick="setCheckinPageTab('unattended')">Unattended</button>
+        <button class="vtab" data-v="alerts" onclick="setCheckinPageTab('alerts')">Alerts</button>
+        <button class="vtab" data-v="remote" onclick="setCheckinPageTab('remote')">Remote Check-Ins</button>
+        <button class="vtab" data-v="access" onclick="setCheckinPageTab('access')">Access Control Events</button>
+        <button class="vtab" data-v="display" onclick="setCheckinPageTab('display')">Check-In Display</button>
+      </div>
+
+      <div id="checkin-tab-search">
+        <div class="grid-2">
+          <div>
+            <div class="panel">
+              <div class="panel-head"><h3>Check In a Member</h3></div>
+              <div class="panel-body">
+                <input type="text" id="checkin-search" placeholder="Enter last name or barcode" oninput="renderCheckinSearch()" style="width:100%;margin-bottom:16px;">
+                <div id="checkin-search-results"></div>
+              </div>
             </div>
           </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Club Check-In Feed</h3><div class="muted" id="checkin-count"></div></div>
+            <div class="panel-body" style="padding:0;max-height:520px;overflow-y:auto;" id="checkin-feed"></div>
+          </div>
         </div>
+      </div>
+
+      <div id="checkin-tab-attended" style="display:none;">
+        <div class="panel"><table><thead><tr><th>Member</th><th>Type</th><th>Time</th></tr></thead><tbody id="attended-tbody"></tbody></table></div>
+      </div>
+
+      <div id="checkin-tab-unattended" style="display:none;">
         <div class="panel">
-          <div class="panel-head"><h3>Club Check-In Feed</h3><div class="muted" id="checkin-count"></div></div>
-          <div class="panel-body" style="padding:0;max-height:520px;overflow-y:auto;" id="checkin-feed"></div>
+          <div class="panel-head"><h3>Unattended Check-Ins</h3><button class="btn btn-sm btn-solid" onclick="openUnattendedModal()">+ Log Unattended Check-In</button></div>
+          <table><thead><tr><th>Member</th><th>Method</th><th>Time</th></tr></thead><tbody id="unattended-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="checkin-tab-alerts" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Check-In Alerts</h3><button class="btn btn-sm btn-solid" onclick="openCheckinAlertModal()">+ New Alert</button></div>
+          <table><thead><tr><th>Member</th><th>Alert</th><th>Severity</th><th>Created</th></tr></thead><tbody id="checkin-alerts-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="checkin-tab-remote" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Remote Check-Ins</h3><button class="btn btn-sm btn-solid" onclick="openRemoteCheckinModal()">+ Log Remote Check-In</button></div>
+          <table><thead><tr><th>Member</th><th>Location</th><th>Time</th></tr></thead><tbody id="remote-checkin-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="checkin-tab-access" style="display:none;">
+        <div class="panel">
+          <table><thead><tr><th>Event</th><th>Access Point</th><th>Member</th><th>Result</th><th>Time</th></tr></thead><tbody id="access-control-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="checkin-tab-display" style="display:none;">
+        <div class="panel" style="padding:30px; text-align:center;">
+          <div class="muted" style="font-size:12px; letter-spacing:0.14em; text-transform:uppercase; margin-bottom:16px;">Live Check-In Display</div>
+          <div id="checkin-display-body" style="font-size:22px; line-height:2;"></div>
         </div>
       </div>
     </div>
@@ -471,6 +567,10 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="vtab active" data-v="register" onclick="setPosPageTab('register')">Register</button>
         <button class="vtab" data-v="drawers" onclick="setPosPageTab('drawers')">Drawers</button>
         <button class="vtab" data-v="transactions" onclick="setPosPageTab('transactions')">Transactions</button>
+        <button class="vtab" data-v="receipts" onclick="setPosPageTab('receipts')">Receipts</button>
+        <button class="vtab" data-v="gcTransactions" onclick="setPosPageTab('gcTransactions')">Gift Card Transactions</button>
+        <button class="vtab" data-v="clubBilling" onclick="setPosPageTab('clubBilling')">Club Account Billing</button>
+        <button class="vtab" data-v="sales" onclick="setPosPageTab('sales')">Sales</button>
         <button class="vtab" data-v="settlement" onclick="setPosPageTab('settlement')">Settlement &amp; Reconciliation</button>
       </div>
 
@@ -518,6 +618,35 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         </div>
       </div>
 
+      <div id="pos-tab-receipts" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Receipts</h3></div>
+          <table><thead><tr><th>Receipt #</th><th>Member</th><th>Amount</th><th>Date</th><th></th></tr></thead><tbody id="receipts-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="pos-tab-gcTransactions" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Gift Card Transactions</h3><button class="btn btn-sm btn-solid" onclick="openGcTransactionModal()">+ Log Redemption/Load</button></div>
+          <table><thead><tr><th>Gift Card</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Date</th></tr></thead><tbody id="gc-transactions-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="pos-tab-clubBilling" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Club Account Billing</h3><button class="btn btn-sm btn-solid" onclick="openClubBillingModal()">+ Charge to Club Account</button></div>
+          <table><thead><tr><th>Member</th><th>Item</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead><tbody id="club-billing-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="pos-tab-sales" style="display:none;">
+        <div class="kpi-row" id="sales-kpi-row" style="grid-template-columns:repeat(3,1fr);"></div>
+        <div class="panel">
+          <div class="panel-head"><h3>Sales by Category</h3></div>
+          <div class="panel-body" id="sales-chart"></div>
+        </div>
+      </div>
+
       <div id="pos-tab-settlement" style="display:none;">
         <div class="kpi-row" id="settlement-kpi-row" style="grid-template-columns:repeat(3,1fr);"></div>
         <div class="panel">
@@ -536,9 +665,30 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="vtab active" data-v="standard" onclick="setCatalogTab('standard')">Standard Reports</button>
         <button class="vtab" data-v="adhoc" onclick="setCatalogTab('adhoc')">Ad Hoc Reports</button>
         <button class="vtab" data-v="dashboards" onclick="setCatalogTab('dashboards')">Dashboards</button>
+        <button class="vtab" data-v="tools" onclick="setCatalogTab('tools')">Tools</button>
       </div>
-      <input type="text" id="catalog-search" placeholder="Search reports by name..." oninput="renderCatalog()" style="width:320px;margin-bottom:18px;">
-      <div class="grid-3" id="catalog-grid"></div>
+      <div id="catalog-browse">
+        <input type="text" id="catalog-search" placeholder="Search reports by name..." oninput="renderCatalog()" style="width:320px;margin-bottom:18px;">
+        <div class="grid-3" id="catalog-grid"></div>
+      </div>
+      <div id="catalog-tools" style="display:none;">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>Mailing Labels</h3><button class="btn btn-sm btn-solid" onclick="printMailingLabels()">Print Labels</button></div>
+            <div class="panel-body">
+              <p class="muted" style="margin-bottom:12px;">Generates a printable mailing label sheet from your current member directory.</p>
+              <div id="mailing-labels-preview"></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>Inventory Label</h3><button class="btn btn-sm btn-solid" onclick="printInventoryLabels()">Print Labels</button></div>
+            <div class="panel-body">
+              <p class="muted" style="margin-bottom:12px;">Generates a printable price/barcode label sheet from your product catalog.</p>
+              <div id="inventory-labels-preview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -728,12 +878,15 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         <button class="btn" onclick="openAdvancedSearchModal()">Advanced Search</button>
         <button class="btn" onclick="exportMembersCSV()">Export CSV</button>
         <button class="btn" onclick="simulateScan()">Simulate Barcode Scan</button>
+        <button class="btn" onclick="openFastAddModal()">Fast Add</button>
         <button class="btn btn-solid" onclick="openMemberModal()">+ New Member</button>
       </div>
     </div>
     <div class="page-inner" style="padding:26px 30px;">
       <div class="view-tabs" id="members-page-tabs" style="margin-bottom:20px;">
         <button class="vtab active" data-v="directory" onclick="setMembersPageTab('directory')">Directory</button>
+        <button class="vtab" data-v="agreements" onclick="setMembersPageTab('agreements')">Agreements</button>
+        <button class="vtab" data-v="recurring" onclick="setMembersPageTab('recurring')">Recurring Services</button>
         <button class="vtab" data-v="sets" onclick="setMembersPageTab('sets')">Member Sets</button>
         <button class="vtab" data-v="onhold" onclick="setMembersPageTab('onhold')">On Hold Services</button>
         <button class="vtab" data-v="corporate" onclick="setMembersPageTab('corporate')">Corporate Groups</button>
@@ -742,6 +895,20 @@ tr:hover td{background:rgba(255,255,255,0.015);}
       <div id="members-tab-directory">
         <div id="scan-result"></div>
         <div class="grid-3" id="members-grid" style="margin-top:14px;"></div>
+      </div>
+
+      <div id="members-tab-agreements" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Agreements</h3><button class="btn btn-sm btn-solid" onclick="openNewAgreementModal()">+ New Agreement</button></div>
+          <table><thead><tr><th>Agreement #</th><th>Member</th><th>Type</th><th>Term</th><th>Status</th></tr></thead><tbody id="agreements-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="members-tab-recurring" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Recurring Services</h3><button class="btn btn-sm btn-solid" onclick="openRecurringServiceModal()">+ New Recurring Service</button></div>
+          <table><thead><tr><th>Member</th><th>Service</th><th>Amount</th><th>Frequency</th><th>Next Charge</th></tr></thead><tbody id="recurring-services-tbody"></tbody></table>
+        </div>
       </div>
 
       <div id="members-tab-sets" style="display:none;">
@@ -1258,6 +1425,161 @@ tr:hover td{background:rgba(255,255,255,0.015);}
         </div>
       </div>
       <div class="modal-foot"><button type="button" class="btn" onclick="closeCorporateModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Account</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- NEW AGREEMENT MODAL -->
+<div class="modal-scrim" id="new-agreement-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Agreement</h3><button class="modal-close" onclick="closeNewAgreementModal()">&times;</button></div>
+    <form id="new-agreement-form" onsubmit="saveNewAgreement(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="ag-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Membership Type</label><select id="ag-type"><option>Elevate</option><option>Elevate+</option><option>All-Access</option></select></div>
+          <div class="form-field"><label>Term</label><select id="ag-term"><option>Month-to-Month</option><option>12 Month</option><option>24 Month</option></select></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeNewAgreementModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Agreement</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- RECURRING SERVICE MODAL -->
+<div class="modal-scrim" id="recurring-service-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Recurring Service</h3><button class="modal-close" onclick="closeRecurringServiceModal()">&times;</button></div>
+    <form id="recurring-service-form" onsubmit="saveRecurringService(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="rs-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Service</label><select id="rs-service"><option>Personal Training Package</option><option>Reformer Pilates Package</option><option>Kids Club</option></select></div>
+          <div class="form-field"><label>Amount ($)</label><input id="rs-amount" type="number" step="0.01" required></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Frequency</label><select id="rs-frequency"><option>Monthly</option><option>Weekly</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRecurringServiceModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Service</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- FAST ADD MODAL -->
+<div class="modal-scrim" id="fast-add-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Fast Add</h3><button class="modal-close" onclick="closeFastAddModal()">&times;</button></div>
+    <form id="fast-add-form" onsubmit="saveFastAdd(event)">
+      <div class="modal-body">
+        <div class="form-field"><label>Name</label><input id="fa-name" required></div>
+        <p class="small-note">Fast Add creates a minimal member record instantly — fill in the rest of their profile later from the Directory.</p>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeFastAddModal()">Cancel</button><button type="submit" class="btn btn-solid">Add Member</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD SECONDARY MODAL -->
+<div class="modal-scrim" id="add-secondary-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add Secondary Member</h3><button class="modal-close" onclick="closeAddSecondaryModal()">&times;</button></div>
+    <form id="add-secondary-form" onsubmit="saveAddSecondary(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Secondary Member Name</label><input id="sec-name" required></div>
+        <div class="form-field"><label>Relationship</label><select id="sec-relationship"><option>Spouse</option><option>Child</option><option>Dependent</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeAddSecondaryModal()">Cancel</button><button type="submit" class="btn btn-solid">Add to Agreement</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CREATE MEMBER DOCUMENT MODAL -->
+<div class="modal-scrim" id="member-document-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Create Member Document</h3><button class="modal-close" onclick="closeMemberDocumentModal()">&times;</button></div>
+    <form id="member-document-form" onsubmit="saveMemberDocument(event)">
+      <div class="modal-body">
+        <div class="form-field"><label>Document Type</label><select id="md-type"><option>Cancellation Letter</option><option>Freeze Confirmation</option><option>Account Statement</option><option>Custom Letter</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberDocumentModal()">Cancel</button><button type="submit" class="btn btn-solid">Generate Document</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- GIFT CARD TRANSACTION MODAL -->
+<div class="modal-scrim" id="gc-transaction-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Gift Card Transaction</h3><button class="modal-close" onclick="closeGcTransactionModal()">&times;</button></div>
+    <form id="gc-transaction-form" onsubmit="saveGcTransaction(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Gift Card Code</label><select id="gct-card"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Type</label><select id="gct-type"><option value="redemption">Redemption</option><option value="load">Load / Reload</option></select></div>
+          <div class="form-field"><label>Amount ($)</label><input id="gct-amount" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeGcTransactionModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Transaction</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CLUB ACCOUNT BILLING MODAL -->
+<div class="modal-scrim" id="club-billing-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Charge to Club Account</h3><button class="modal-close" onclick="closeClubBillingModal()">&times;</button></div>
+    <form id="club-billing-form" onsubmit="saveClubBilling(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="cb-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Item / Description</label><input id="cb-item" required></div>
+          <div class="form-field"><label>Amount ($)</label><input id="cb-amount" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeClubBillingModal()">Cancel</button><button type="submit" class="btn btn-solid">Charge Account</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- UNATTENDED CHECK-IN MODAL -->
+<div class="modal-scrim" id="unattended-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Unattended Check-In</h3><button class="modal-close" onclick="closeUnattendedModal()">&times;</button></div>
+    <form id="unattended-form" onsubmit="saveUnattended(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="un-member"></select></div>
+        <div class="form-field"><label>Method</label><select id="un-method"><option>Kiosk</option><option>Mobile App</option><option>Key Fob</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeUnattendedModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Check-In</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CHECK-IN ALERT MODAL -->
+<div class="modal-scrim" id="checkin-alert-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Check-In Alert</h3><button class="modal-close" onclick="closeCheckinAlertModal()">&times;</button></div>
+    <form id="checkin-alert-form" onsubmit="saveCheckinAlert(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="ca-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Alert Message</label><input id="ca-message" placeholder="e.g. Past due balance" required></div>
+          <div class="form-field"><label>Severity</label><select id="ca-severity"><option>Info</option><option>Warning</option><option>Critical</option></select></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeCheckinAlertModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Alert</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- REMOTE CHECK-IN MODAL -->
+<div class="modal-scrim" id="remote-checkin-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Remote Check-In</h3><button class="modal-close" onclick="closeRemoteCheckinModal()">&times;</button></div>
+    <form id="remote-checkin-form" onsubmit="saveRemoteCheckin(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="rc-member"></select></div>
+        <div class="form-field"><label>Location</label><input id="rc-location" placeholder="e.g. Partner gym, mobile geofence"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRemoteCheckinModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Check-In</button></div>
     </form>
   </div>
 </div>
@@ -2016,6 +2338,28 @@ function seedIfEmpty(){
   DB.set('repeatingEvents', []);
   DB.set('eventGroups', []);
 
+  // --- Check-in sub-views (empty — ready to populate) ---
+  DB.set('unattendedCheckins', []);
+  DB.set('checkinAlerts', []);
+  DB.set('remoteCheckins', []);
+  DB.set('accessControlEvents', []);
+
+  // --- POS sub-views (empty — ready to populate) ---
+  DB.set('giftCardTransactions', []);
+  DB.set('clubAccountBilling', []);
+
+  // --- Members sub-views (empty — ready to populate) ---
+  DB.set('agreements', []);
+  DB.set('recurringServices', []);
+
+  // --- Calendar sub-views (empty — ready to populate) ---
+  DB.set('eventValueSummary', []);
+  DB.set('employeeTracking', []);
+  DB.set('closeoutAttendance', []);
+  DB.set('closeoutUnbookedEmployee', []);
+  DB.set('closeoutUnbookedLocation', []);
+  DB.set('closeoutUnfunded', []);
+
   DB.set('seeded', true);
 }
 seedIfEmpty();
@@ -2389,7 +2733,7 @@ function renderCalendarGrid(){
 function setCalendarPageTab(tab){
   document.querySelectorAll('#calendar-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#calendar-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  ['week','events','repeating','groups','enroll'].forEach(t=>{
+  ['week','events','repeating','groups','valuesummary','employeetracking','eventstats','closeout','enroll'].forEach(t=>{
     document.getElementById('calendar-tab-'+t).style.display = (t===tab) ? '' : 'none';
   });
 }
@@ -2486,6 +2830,70 @@ function renderMemberEnroll(){
 function renderCalendar(){
   renderCalendarFilters(); renderCalendarGrid();
   renderEvents(); renderRepeating(); renderEventGroups(); renderMemberEnroll();
+  renderEventValueSummary(); renderEmployeeTracking(); renderEventStats(); renderCloseoutAll();
+}
+
+/* ---------- Event Value Summary ---------- */
+function renderEventValueSummary(){
+  const rows = DB.get('eventValueSummary',[]);
+  const totalRevenue = rows.reduce((s,r)=>s+r.revenue,0);
+  document.getElementById('event-value-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Events</div><div class="val">${rows.length}</div></div>
+    <div class="kpi"><div class="lbl">Total Attendees</div><div class="val">${rows.reduce((s,r)=>s+r.attendees,0)}</div></div>
+    <div class="kpi"><div class="lbl">Revenue Generated</div><div class="val">${fmtMoney(totalRevenue)}</div></div>
+  `;
+  document.getElementById('event-value-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.event}</td><td>${r.attendees}</td><td>${fmtMoney(r.revenue)}</td></tr>
+  `).join('') || '<tr><td colspan="3" class="muted" style="padding:16px;">No event value data yet.</td></tr>';
+}
+
+/* ---------- Employee Tracking ---------- */
+function renderEmployeeTracking(){
+  const rows = DB.get('employeeTracking',[]);
+  document.getElementById('employee-tracking-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.employee}</td><td class="muted">${r.clockIn?fmtDate(r.clockIn):'—'}</td><td class="muted">${r.clockOut?fmtDate(r.clockOut):'—'}</td><td>${r.hours||'—'}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No employee time entries yet.</td></tr>';
+}
+
+/* ---------- Event Statistics ---------- */
+function renderEventStats(){
+  const events = DB.get('scheduledEvents',[]);
+  const byType = {};
+  events.forEach(e=>{ byType[e.type] = (byType[e.type]||0)+1; });
+  const labels = Object.keys(byType);
+  document.getElementById('event-stats-chart').innerHTML = labels.length
+    ? barChart(labels.map(l=>l.split(' ')[0]), labels.map(l=>byType[l]), {color:'#5b8fd9'})
+    : '<p class="muted" style="padding:20px 0;">No events yet to generate statistics from.</p>';
+}
+
+/* ---------- Schedule Close Out ---------- */
+function setCloseoutTab(tab){
+  document.querySelectorAll('#closeout-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#closeout-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['attendance','unbookedEmployee','unbookedLocation','unfunded'].forEach(t=>{
+    document.getElementById('closeout-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+function renderCloseoutAll(){
+  const attendance = DB.get('closeoutAttendance',[]);
+  document.getElementById('closeout-attendance-tbody').innerHTML = attendance.map(r=>`
+    <tr><td>${r.event}</td><td>${r.expected}</td><td>${r.attended}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No attendance records yet.</td></tr>';
+
+  const unbookedEmp = DB.get('closeoutUnbookedEmployee',[]);
+  document.getElementById('closeout-unbooked-employee-tbody').innerHTML = unbookedEmp.map(r=>`
+    <tr><td>${r.employee}</td><td class="muted">${r.shift}</td><td class="muted">${r.reason||'—'}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No unbooked employee events.</td></tr>';
+
+  const unbookedLoc = DB.get('closeoutUnbookedLocation',[]);
+  document.getElementById('closeout-unbooked-location-tbody').innerHTML = unbookedLoc.map(r=>`
+    <tr><td>${r.location}</td><td class="muted">${r.timeSlot}</td><td class="muted">${r.reason||'—'}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No unbooked location events.</td></tr>';
+
+  const unfunded = DB.get('closeoutUnfunded',[]);
+  document.getElementById('closeout-unfunded-tbody').innerHTML = unfunded.map(r=>`
+    <tr><td>${r.event}</td><td class="muted">${r.memberName}</td><td>${fmtMoney(r.amountDue)}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No unfunded events.</td></tr>';
 }
 
 function renderConversations(){
@@ -2867,7 +3275,121 @@ function doCheckin(memberId){
   renderCheckinFeed();
   toast(`${m.name} checked in.`);
 }
-function renderCheckin(){ renderCheckinFeed(); renderCheckinSearch(); }
+function setCheckinPageTab(tab){
+  document.querySelectorAll('#checkin-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#checkin-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['search','attended','unattended','alerts','remote','access','display'].forEach(t=>{
+    document.getElementById('checkin-tab-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+
+/* ---------- Attended ---------- */
+function renderAttended(){
+  const feed = DB.get('checkinFeed',[]);
+  document.getElementById('attended-tbody').innerHTML = feed.map(c=>`
+    <tr><td>${c.name}</td><td class="muted">${c.type}</td><td class="muted">${fmtDate(c.time)}</td></tr>
+  `).join('') || '<tr><td colspan="3" class="muted" style="padding:16px;">No attended check-ins yet.</td></tr>';
+}
+
+/* ---------- Unattended ---------- */
+function renderUnattended(){
+  const rows = DB.get('unattendedCheckins',[]);
+  document.getElementById('unattended-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.memberName}</td><td class="muted">${r.method}</td><td class="muted">${fmtDate(r.time)}</td></tr>
+  `).join('') || '<tr><td colspan="3" class="muted" style="padding:16px;">No unattended check-ins yet.</td></tr>';
+}
+function openUnattendedModal(){
+  const sel = document.getElementById('un-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('unattended-form').reset();
+  document.getElementById('unattended-modal').classList.add('open');
+}
+function closeUnattendedModal(){ document.getElementById('unattended-modal').classList.remove('open'); }
+function saveUnattended(e){
+  e.preventDefault();
+  const sel = document.getElementById('un-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('unattendedCheckins',[]);
+  rows.unshift({ memberName, method: document.getElementById('un-method').value, time: new Date().toISOString() });
+  DB.set('unattendedCheckins', rows);
+  closeUnattendedModal();
+  renderUnattended();
+  toast('Unattended check-in logged.');
+}
+
+/* ---------- Alerts ---------- */
+function renderCheckinAlerts(){
+  const rows = DB.get('checkinAlerts',[]);
+  document.getElementById('checkin-alerts-tbody').innerHTML = rows.map(r=>{
+    const pill = r.severity==='Critical' ? 'pill-overdue' : (r.severity==='Warning' ? 'pill-due' : 'pill-contacted');
+    return `<tr><td>${r.memberName}</td><td class="muted">${r.message}</td><td><span class="pill ${pill}">${r.severity}</span></td><td class="muted">${fmtDate(r.createdAt)}</td></tr>`;
+  }).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No active alerts.</td></tr>';
+}
+function openCheckinAlertModal(){
+  const sel = document.getElementById('ca-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('checkin-alert-form').reset();
+  document.getElementById('checkin-alert-modal').classList.add('open');
+}
+function closeCheckinAlertModal(){ document.getElementById('checkin-alert-modal').classList.remove('open'); }
+function saveCheckinAlert(e){
+  e.preventDefault();
+  const sel = document.getElementById('ca-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('checkinAlerts',[]);
+  rows.unshift({ memberName, message: document.getElementById('ca-message').value.trim(), severity: document.getElementById('ca-severity').value, createdAt: new Date().toISOString() });
+  DB.set('checkinAlerts', rows);
+  closeCheckinAlertModal();
+  renderCheckinAlerts();
+  toast('Alert created.');
+}
+
+/* ---------- Remote Check-Ins ---------- */
+function renderRemoteCheckins(){
+  const rows = DB.get('remoteCheckins',[]);
+  document.getElementById('remote-checkin-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.memberName}</td><td class="muted">${r.location||'—'}</td><td class="muted">${fmtDate(r.time)}</td></tr>
+  `).join('') || '<tr><td colspan="3" class="muted" style="padding:16px;">No remote check-ins yet.</td></tr>';
+}
+function openRemoteCheckinModal(){
+  const sel = document.getElementById('rc-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('remote-checkin-form').reset();
+  document.getElementById('remote-checkin-modal').classList.add('open');
+}
+function closeRemoteCheckinModal(){ document.getElementById('remote-checkin-modal').classList.remove('open'); }
+function saveRemoteCheckin(e){
+  e.preventDefault();
+  const sel = document.getElementById('rc-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('remoteCheckins',[]);
+  rows.unshift({ memberName, location: document.getElementById('rc-location').value.trim(), time: new Date().toISOString() });
+  DB.set('remoteCheckins', rows);
+  closeRemoteCheckinModal();
+  renderRemoteCheckins();
+  toast('Remote check-in logged.');
+}
+
+/* ---------- Access Control Events ---------- */
+function renderAccessControl(){
+  const rows = DB.get('accessControlEvents',[]);
+  document.getElementById('access-control-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.event}</td><td class="muted">${r.accessPoint}</td><td class="muted">${r.memberName||'—'}</td><td>${r.result}</td><td class="muted">${fmtDate(r.time)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No access control events logged yet — these populate from door/turnstile hardware once connected.</td></tr>';
+}
+
+/* ---------- Check-In Display ---------- */
+function renderCheckinDisplay(){
+  const feed = [...DB.get('checkinFeed',[])].slice(0,8);
+  document.getElementById('checkin-display-body').innerHTML = feed.map(c=>`
+    <div>${c.name.toUpperCase()} <span class="muted" style="font-size:14px;">— ${c.type}</span></div>
+  `).join('') || '<div class="muted">No check-ins yet today.</div>';
+}
+
+function renderCheckin(){
+  renderCheckinFeed(); renderCheckinSearch();
+  renderAttended(); renderUnattended(); renderCheckinAlerts(); renderRemoteCheckins(); renderAccessControl(); renderCheckinDisplay();
+}
 
 /* =========================================================
    POINT OF SALE
@@ -2948,9 +3470,99 @@ function posCheckout(){
 function setPosPageTab(tab){
   document.querySelectorAll('#pos-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#pos-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  ['register','drawers','transactions','settlement'].forEach(t=>{
+  ['register','drawers','transactions','receipts','gcTransactions','clubBilling','sales','settlement'].forEach(t=>{
     document.getElementById('pos-tab-'+t).style.display = (t===tab) ? '' : 'none';
   });
+}
+
+/* ---------- Receipts ---------- */
+function renderReceipts(){
+  const txns = DB.get('posTransactions',[]);
+  document.getElementById('receipts-tbody').innerHTML = txns.map((t,i)=>`
+    <tr><td>#${1000+i}</td><td class="muted">Walk-In</td><td>${fmtMoney(t.amount)}</td><td class="muted">${fmtDate(t.date)}</td>
+    <td><button class="btn btn-sm" onclick="window.print()">Print</button></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No receipts yet — completed sales appear here.</td></tr>';
+}
+
+/* ---------- Gift Card Transactions ---------- */
+function renderGcTransactions(){
+  const rows = DB.get('giftCardTransactions',[]);
+  document.getElementById('gc-transactions-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.cardCode}</td><td class="muted">${r.type}</td><td>${fmtMoney(r.amount)}</td><td>${fmtMoney(r.balanceAfter)}</td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No gift card transactions yet.</td></tr>';
+}
+function openGcTransactionModal(){
+  const sel = document.getElementById('gct-card');
+  sel.innerHTML = DB.get('giftCards',[]).map(g=>`<option value="${g.code}">${g.code} (${fmtMoney(g.balance)} remaining)</option>`).join('') || '<option value="">No gift cards yet</option>';
+  document.getElementById('gc-transaction-form').reset();
+  document.getElementById('gc-transaction-modal').classList.add('open');
+}
+function closeGcTransactionModal(){ document.getElementById('gc-transaction-modal').classList.remove('open'); }
+function saveGcTransaction(e){
+  e.preventDefault();
+  const cardCode = document.getElementById('gct-card').value;
+  const type = document.getElementById('gct-type').value;
+  const amount = parseFloat(document.getElementById('gct-amount').value)||0;
+  const cards = DB.get('giftCards',[]);
+  const card = cards.find(c=>c.code===cardCode);
+  if(card){
+    card.balance = type==='load' ? card.balance + amount : Math.max(0, card.balance - amount);
+    DB.set('giftCards', cards);
+  }
+  const rows = DB.get('giftCardTransactions',[]);
+  rows.unshift({ cardCode, type: type==='load' ? 'Load' : 'Redemption', amount, balanceAfter: card?card.balance:0, date: new Date().toISOString() });
+  DB.set('giftCardTransactions', rows);
+  closeGcTransactionModal();
+  renderGcTransactions();
+  renderGiftCards();
+  toast('Gift card transaction logged.');
+}
+
+/* ---------- Club Account Billing ---------- */
+function renderClubBilling(){
+  const rows = DB.get('clubAccountBilling',[]);
+  document.getElementById('club-billing-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.memberName}</td><td class="muted">${r.item}</td><td>${fmtMoney(r.amount)}</td><td><span class="pill pill-due">${r.status}</span></td><td class="muted">${fmtDate(r.date)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No club account charges yet.</td></tr>';
+}
+function openClubBillingModal(){
+  const sel = document.getElementById('cb-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('club-billing-form').reset();
+  document.getElementById('club-billing-modal').classList.add('open');
+}
+function closeClubBillingModal(){ document.getElementById('club-billing-modal').classList.remove('open'); }
+function saveClubBilling(e){
+  e.preventDefault();
+  const sel = document.getElementById('cb-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('clubAccountBilling',[]);
+  rows.unshift({ memberName, item: document.getElementById('cb-item').value.trim(), amount: parseFloat(document.getElementById('cb-amount').value)||0, status:'pending', date: new Date().toISOString() });
+  DB.set('clubAccountBilling', rows);
+  closeClubBillingModal();
+  renderClubBilling();
+  toast('Charged to club account.');
+}
+
+/* ---------- Sales ---------- */
+function renderSales(){
+  const txns = DB.get('posTransactions',[]);
+  const total = txns.reduce((s,t)=>s+t.amount,0);
+  document.getElementById('sales-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Total Sales</div><div class="val">${fmtMoney(total)}</div></div>
+    <div class="kpi"><div class="lbl">Transactions</div><div class="val">${txns.length}</div></div>
+    <div class="kpi"><div class="lbl">Avg. Sale</div><div class="val">${txns.length ? fmtMoney(total/txns.length) : '$0.00'}</div></div>
+  `;
+  document.getElementById('sales-chart').innerHTML = txns.length
+    ? barChart(txns.slice(0,7).map((t,i)=>'#'+(i+1)), txns.slice(0,7).map(t=>t.amount), {color:'#c9a08f'})
+    : '<p class="muted" style="padding:20px 0;">No sales yet.</p>';
+}
+
+function renderPos(){
+  renderPosItems(); renderPosCart();
+  renderDrawers(); renderDrawerSummary();
+  renderPosTransactions(); renderSettlement();
+  renderReceipts(); renderGcTransactions(); renderClubBilling(); renderSales();
 }
 
 /* ---------- Drawer Management ---------- */
@@ -3032,12 +3644,6 @@ function runReconciliation(){
   toast('Reconciliation run.');
 }
 
-function renderPos(){
-  renderPosItems(); renderPosCart();
-  renderDrawers(); renderDrawerSummary();
-  renderPosTransactions(); renderSettlement();
-}
-
 /* =========================================================
    MEMBER RETENTION
    ========================================================= */
@@ -3072,8 +3678,46 @@ function setCatalogTab(tab){
   catalogTab = tab;
   document.querySelectorAll('#catalog-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#catalog-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  renderCatalog();
+  if(tab === 'tools'){
+    document.getElementById('catalog-browse').style.display = 'none';
+    document.getElementById('catalog-tools').style.display = '';
+    renderMailingLabelsPreview();
+    renderInventoryLabelsPreview();
+  } else {
+    document.getElementById('catalog-browse').style.display = '';
+    document.getElementById('catalog-tools').style.display = 'none';
+    renderCatalog();
+  }
 }
+
+/* ---------- Mailing Labels ---------- */
+function renderMailingLabelsPreview(){
+  const members = DB.get('members',[]);
+  document.getElementById('mailing-labels-preview').innerHTML = members.slice(0,5).map(m=>`
+    <div class="info-row"><div class="k">${m.name}</div><div class="v muted">${m.email || 'No address on file'}</div></div>
+  `).join('') || '<p class="muted">No members to generate labels from yet.</p>';
+}
+function printMailingLabels(){
+  const members = DB.get('members',[]);
+  if(!members.length){ toast('No members to print labels for yet.'); return; }
+  window.print();
+  toast(`Printing ${members.length} mailing label(s).`);
+}
+
+/* ---------- Inventory Label ---------- */
+function renderInventoryLabelsPreview(){
+  const products = DB.get('products',[]);
+  document.getElementById('inventory-labels-preview').innerHTML = products.slice(0,5).map(p=>`
+    <div class="info-row"><div class="k">${p.name}</div><div class="v muted">${fmtMoney(p.price)}</div></div>
+  `).join('') || '<p class="muted">No products to generate labels from yet.</p>';
+}
+function printInventoryLabels(){
+  const products = DB.get('products',[]);
+  if(!products.length){ toast('No products to print labels for yet.'); return; }
+  window.print();
+  toast(`Printing ${products.length} inventory label(s).`);
+}
+
 function renderCatalog(){
   const q = (document.getElementById('catalog-search')||{}).value?.toLowerCase().trim() || '';
   const names = REPORT_CATALOG[catalogTab].filter(n => !q || n.toLowerCase().includes(q));
@@ -3420,12 +4064,117 @@ function renderMembers(){
     </div>
   `).join('');
   renderMemberSets(); renderOnHold(); renderCorporate();
+  renderAgreements(); renderRecurringServices();
+}
+
+/* ---------- Agreements ---------- */
+function renderAgreements(){
+  const rows = DB.get('agreements',[]);
+  document.getElementById('agreements-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.number}</td><td>${r.memberName}</td><td class="muted">${r.type}</td><td class="muted">${r.term}</td><td><span class="pill pill-member">${r.status}</span></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No agreements yet.</td></tr>';
+}
+function openNewAgreementModal(){
+  const sel = document.getElementById('ag-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('new-agreement-form').reset();
+  document.getElementById('new-agreement-modal').classList.add('open');
+}
+function closeNewAgreementModal(){ document.getElementById('new-agreement-modal').classList.remove('open'); }
+function saveNewAgreement(e){
+  e.preventDefault();
+  const sel = document.getElementById('ag-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('agreements',[]);
+  rows.push({
+    number: 'AG-' + String(100000 + rows.length*7),
+    memberName, type: document.getElementById('ag-type').value, term: document.getElementById('ag-term').value, status:'active',
+  });
+  DB.set('agreements', rows);
+  closeNewAgreementModal();
+  renderAgreements();
+  toast('Agreement created.');
+}
+
+/* ---------- Recurring Services ---------- */
+function renderRecurringServices(){
+  const rows = DB.get('recurringServices',[]);
+  document.getElementById('recurring-services-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.memberName}</td><td class="muted">${r.service}</td><td>${fmtMoney(r.amount)}</td><td class="muted">${r.frequency}</td><td class="muted">${fmtDate(r.nextCharge)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No recurring services set up yet.</td></tr>';
+}
+function openRecurringServiceModal(){
+  const sel = document.getElementById('rs-member');
+  sel.innerHTML = DB.get('members',[]).map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('recurring-service-form').reset();
+  document.getElementById('recurring-service-modal').classList.add('open');
+}
+function closeRecurringServiceModal(){ document.getElementById('recurring-service-modal').classList.remove('open'); }
+function saveRecurringService(e){
+  e.preventDefault();
+  const sel = document.getElementById('rs-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const rows = DB.get('recurringServices',[]);
+  const next = new Date(); next.setMonth(next.getMonth()+1);
+  rows.push({
+    memberName, service: document.getElementById('rs-service').value,
+    amount: parseFloat(document.getElementById('rs-amount').value)||0,
+    frequency: document.getElementById('rs-frequency').value, nextCharge: next.toISOString(),
+  });
+  DB.set('recurringServices', rows);
+  closeRecurringServiceModal();
+  renderRecurringServices();
+  toast('Recurring service created.');
+}
+
+/* ---------- Fast Add ---------- */
+function openFastAddModal(){ document.getElementById('fast-add-form').reset(); document.getElementById('fast-add-modal').classList.add('open'); }
+function closeFastAddModal(){ document.getElementById('fast-add-modal').classList.remove('open'); }
+function saveFastAdd(e){
+  e.preventDefault();
+  const members = DB.get('members',[]);
+  const name = document.getElementById('fa-name').value.trim();
+  const code = 'ELV' + String(100000 + members.length*37 + Math.floor(Math.random()*9));
+  members.push({ id: uid('mem'), name, email:'', tier:'Elevate', barcode: code, status:'active', joinedAt: new Date().toISOString(), lastVisit: new Date().toISOString(), alert:null, pastDue:0, lateFee:0, secondaryMembers:0, paymentMethod:'Not on file', freeze:false });
+  DB.set('members', members);
+  closeFastAddModal();
+  renderMembers();
+  toast(`${name} added — barcode ${code} generated.`);
+}
+
+/* ---------- Add Secondary ---------- */
+let activeMemberForActions = null;
+function openAddSecondaryModal(){ document.getElementById('add-secondary-form').reset(); document.getElementById('add-secondary-modal').classList.add('open'); }
+function closeAddSecondaryModal(){ document.getElementById('add-secondary-modal').classList.remove('open'); }
+function saveAddSecondary(e){
+  e.preventDefault();
+  const members = DB.get('members',[]);
+  const m = members.find(x=>x.id===activeMemberForActions);
+  if(m){ m.secondaryMembers = (m.secondaryMembers||0) + 1; DB.set('members', members); }
+  closeAddSecondaryModal();
+  renderMembers();
+  toast(`${document.getElementById('sec-name').value.trim()} added as secondary member.`);
+}
+
+/* ---------- Create Member Document ---------- */
+function openMemberDocumentModal(){ document.getElementById('member-document-form').reset(); document.getElementById('member-document-modal').classList.add('open'); }
+function closeMemberDocumentModal(){ document.getElementById('member-document-modal').classList.remove('open'); }
+function saveMemberDocument(e){
+  e.preventDefault();
+  const members = DB.get('members',[]);
+  const m = members.find(x=>x.id===activeMemberForActions);
+  const docType = document.getElementById('md-type').value;
+  const docs = DB.get('documents',[]);
+  docs.unshift({ id: uid('doc'), name: docType, recipient: m ? m.name : 'Member', type: docType, status:'draft', sentAt: new Date().toISOString() });
+  DB.set('documents', docs);
+  closeMemberDocumentModal();
+  toast(`${docType} generated for ${m ? m.name : 'member'} — see it under Payments → Documents & Contracts.`);
 }
 
 function setMembersPageTab(tab){
   document.querySelectorAll('#members-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`#members-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
-  ['directory','sets','onhold','corporate'].forEach(t=>{
+  ['directory','agreements','recurring','sets','onhold','corporate'].forEach(t=>{
     document.getElementById('members-tab-'+t).style.display = (t===tab) ? '' : 'none';
   });
 }
@@ -3571,6 +4320,8 @@ function openMemberDetailModal(memberId){
     <div class="info-row"><div class="k">Joined</div><div class="v">${fmtDate(m.joinedAt)}</div></div>
     <div style="margin-top:20px;">
       <button class="btn btn-sm" onclick="toggleFreeze('${m.id}')">${m.freeze ? 'Remove Freeze' : 'Freeze Membership'}</button>
+      <button class="btn btn-sm" onclick="activeMemberForActions='${m.id}'; openAddSecondaryModal();">Add Secondary</button>
+      <button class="btn btn-sm" onclick="activeMemberForActions='${m.id}'; openMemberDocumentModal();">Create Document</button>
     </div>
   `;
   document.getElementById('member-detail-modal').classList.add('open');
