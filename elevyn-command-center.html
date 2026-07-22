@@ -246,6 +246,7 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 
   <div class="nav-group">
     <div class="nav-label">Insights</div>
+    <div class="nav-item" data-page="catalog"><span class="ic">&#128218;</span><span class="lbl">Report Catalog</span></div>
     <div class="nav-item" data-page="retention"><span class="ic">&#9888;</span><span class="lbl">Member Retention</span></div>
     <div class="nav-item" data-page="reviews"><span class="ic">&#9733;</span><span class="lbl">Reviews &amp; Feedback</span></div>
   </div>
@@ -386,17 +387,56 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 
   <!-- CALENDAR -->
   <div class="page" id="page-calendar">
-    <div class="topbar"><div><h1>Calendar</h1><div class="sub">Week view across every bookable calendar — club, staff, and marketing team</div></div></div>
+    <div class="topbar"><div><h1>Calendar</h1><div class="sub">Week view, events, repeating series, and member-facing enrollment</div></div></div>
     <div class="page-inner" style="padding:26px 30px;">
-      <div class="flex-between" style="margin-bottom:16px;">
-        <div class="chip-row" id="calendar-filter-row"></div>
-        <div class="chip-row">
-          <button class="btn btn-sm" onclick="shiftCalendarWeek(-1)">&larr; Prev Week</button>
-          <button class="btn btn-sm" onclick="shiftCalendarWeek(1)">Next Week &rarr;</button>
+      <div class="view-tabs" id="calendar-page-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="week" onclick="setCalendarPageTab('week')">Week View</button>
+        <button class="vtab" data-v="events" onclick="setCalendarPageTab('events')">Events</button>
+        <button class="vtab" data-v="repeating" onclick="setCalendarPageTab('repeating')">Repeating Events</button>
+        <button class="vtab" data-v="groups" onclick="setCalendarPageTab('groups')">Event Groups</button>
+        <button class="vtab" data-v="enroll" onclick="setCalendarPageTab('enroll')">Member-Facing Enroll</button>
+      </div>
+
+      <div id="calendar-tab-week">
+        <div class="flex-between" style="margin-bottom:16px;">
+          <div class="chip-row" id="calendar-filter-row"></div>
+          <div class="chip-row">
+            <button class="btn btn-sm" onclick="shiftCalendarWeek(-1)">&larr; Prev Week</button>
+            <button class="btn btn-sm" onclick="shiftCalendarWeek(1)">Next Week &rarr;</button>
+          </div>
+        </div>
+        <div class="panel" style="overflow-x:auto;">
+          <div id="calendar-grid" style="min-width:820px;"></div>
         </div>
       </div>
-      <div class="panel" style="overflow-x:auto;">
-        <div id="calendar-grid" style="min-width:820px;"></div>
+
+      <div id="calendar-tab-events" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Events</h3><button class="btn btn-sm btn-solid" onclick="openEventModal()">+ New Event</button></div>
+          <table><thead><tr><th>Event</th><th>Type</th><th>Staff</th><th>Date</th><th>Capacity</th></tr></thead><tbody id="events-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="calendar-tab-repeating" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Repeating Events</h3><button class="btn btn-sm btn-solid" onclick="openRepeatingEventModal()">+ New Repeating Event</button></div>
+          <table><thead><tr><th>Event</th><th>Frequency</th><th>Days</th><th>Time</th><th>Staff</th></tr></thead><tbody id="repeating-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="calendar-tab-groups" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Event Groups</h3><button class="btn btn-sm btn-solid" onclick="openEventGroupModal()">+ New Group</button></div>
+          <table><thead><tr><th>Group Name</th><th>Events Included</th><th>Description</th></tr></thead><tbody id="event-groups-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="calendar-tab-enroll" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Member-Facing Enroll</h3></div>
+          <div class="panel-body" id="member-enroll-body"></div>
+        </div>
+        <p class="small-note">This is the view members would see to self-enroll in a class or event. Wiring this up for real self-service requires a member-facing login portal on the live site.</p>
       </div>
     </div>
   </div>
@@ -425,32 +465,80 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 
   <!-- POINT OF SALE -->
   <div class="page" id="page-pos">
-    <div class="topbar"><div><h1>Point of Sale</h1><div class="sub">Ring up merch, day passes, and services at the front desk</div></div></div>
+    <div class="topbar"><div><h1>Point of Sale</h1><div class="sub">Ring up sales, manage drawers, and reconcile settlements</div></div></div>
     <div class="page-inner" style="padding:26px 30px;">
-      <div class="grid-2">
-        <div class="panel">
-          <div class="panel-head"><h3>Items</h3></div>
-          <div class="panel-body">
-            <div class="chip-row" id="pos-cat-tabs" style="margin-bottom:16px;">
-              <button class="chip sel" data-cat="all" onclick="setPosCategory('all')">All</button>
-              <button class="chip" data-cat="Products" onclick="setPosCategory('Products')">Products</button>
-              <button class="chip" data-cat="Services" onclick="setPosCategory('Services')">Services</button>
+      <div class="view-tabs" id="pos-page-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="register" onclick="setPosPageTab('register')">Register</button>
+        <button class="vtab" data-v="drawers" onclick="setPosPageTab('drawers')">Drawers</button>
+        <button class="vtab" data-v="transactions" onclick="setPosPageTab('transactions')">Transactions</button>
+        <button class="vtab" data-v="settlement" onclick="setPosPageTab('settlement')">Settlement &amp; Reconciliation</button>
+      </div>
+
+      <div id="pos-tab-register">
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h3>Items</h3></div>
+            <div class="panel-body">
+              <div class="chip-row" id="pos-cat-tabs" style="margin-bottom:16px;">
+                <button class="chip sel" data-cat="all" onclick="setPosCategory('all')">All</button>
+                <button class="chip" data-cat="Products" onclick="setPosCategory('Products')">Products</button>
+                <button class="chip" data-cat="Services" onclick="setPosCategory('Services')">Services</button>
+              </div>
+              <div id="pos-item-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
             </div>
-            <div id="pos-item-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
           </div>
-        </div>
-        <div class="panel">
-          <div class="panel-head"><h3>Cart</h3><button class="btn btn-sm btn-danger" onclick="clearPosCart()">Clear</button></div>
-          <table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody id="pos-cart-tbody"></tbody></table>
-          <div class="panel-body" style="border-top:1px solid var(--line);">
-            <div class="flex-between" style="margin-bottom:8px;"><span class="muted">Subtotal</span><b id="pos-subtotal">$0.00</b></div>
-            <div class="flex-between" style="margin-bottom:8px;"><span class="muted">Tax (6%)</span><b id="pos-tax">$0.00</b></div>
-            <div class="flex-between" style="margin-bottom:16px;font-size:16px;"><span>Grand Total</span><b id="pos-total">$0.00</b></div>
-            <button class="btn btn-solid" style="width:100%;" onclick="posCheckout()">Check Out</button>
-            <p class="small-note">Checkout logs the sale to Billing. Actually processing a card requires connecting a real payment terminal / Stripe Terminal integration.</p>
+          <div class="panel">
+            <div class="panel-head"><h3>Cart</h3><button class="btn btn-sm btn-danger" onclick="clearPosCart()">Clear</button></div>
+            <table><thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th></th></tr></thead><tbody id="pos-cart-tbody"></tbody></table>
+            <div class="panel-body" style="border-top:1px solid var(--line);">
+              <div class="flex-between" style="margin-bottom:8px;"><span class="muted">Subtotal</span><b id="pos-subtotal">$0.00</b></div>
+              <div class="flex-between" style="margin-bottom:8px;"><span class="muted">Tax (6%)</span><b id="pos-tax">$0.00</b></div>
+              <div class="flex-between" style="margin-bottom:16px;font-size:16px;"><span>Grand Total</span><b id="pos-total">$0.00</b></div>
+              <button class="btn btn-solid" style="width:100%;" onclick="posCheckout()">Check Out</button>
+              <p class="small-note">Checkout logs the sale to Billing. Actually processing a card requires connecting a real payment terminal / Stripe Terminal integration.</p>
+            </div>
           </div>
         </div>
       </div>
+
+      <div id="pos-tab-drawers" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Drawers</h3><button class="btn btn-sm btn-solid" onclick="openDrawerModal()">+ Open Drawer</button></div>
+          <table><thead><tr><th>Drawer</th><th>Opened By</th><th>Opening Balance</th><th>Status</th><th>Opened</th><th></th></tr></thead><tbody id="drawers-tbody"></tbody></table>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Drawer Summary</h3></div>
+          <div class="panel-body" id="drawer-summary-body"></div>
+        </div>
+      </div>
+
+      <div id="pos-tab-transactions" style="display:none;">
+        <div class="panel">
+          <table><thead><tr><th>Transaction</th><th>Item(s)</th><th>Amount</th><th>Payment Method</th><th>Date</th></tr></thead><tbody id="pos-transactions-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="pos-tab-settlement" style="display:none;">
+        <div class="kpi-row" id="settlement-kpi-row" style="grid-template-columns:repeat(3,1fr);"></div>
+        <div class="panel">
+          <div class="panel-head"><h3>Settlement &amp; Reconciliation</h3><button class="btn btn-sm btn-solid" onclick="runReconciliation()">Run Reconciliation</button></div>
+          <table><thead><tr><th>Date</th><th>Expected</th><th>Counted</th><th>Variance</th><th>Status</th></tr></thead><tbody id="settlement-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT CATALOG -->
+  <div class="page" id="page-catalog">
+    <div class="topbar"><div><h1>Report Catalog</h1><div class="sub">Every standard report, ad hoc report, and dashboard, in one browsable library</div></div></div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="view-tabs" id="catalog-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="standard" onclick="setCatalogTab('standard')">Standard Reports</button>
+        <button class="vtab" data-v="adhoc" onclick="setCatalogTab('adhoc')">Ad Hoc Reports</button>
+        <button class="vtab" data-v="dashboards" onclick="setCatalogTab('dashboards')">Dashboards</button>
+      </div>
+      <input type="text" id="catalog-search" placeholder="Search reports by name..." oninput="renderCatalog()" style="width:320px;margin-bottom:18px;">
+      <div class="grid-3" id="catalog-grid"></div>
     </div>
   </div>
 
@@ -637,14 +725,45 @@ tr:hover td{background:rgba(255,255,255,0.015);}
     <div class="topbar">
       <div><h1>Memberships</h1><div class="sub">Every member record, linked to a scannable barcode ID</div></div>
       <div class="topbar-actions">
+        <button class="btn" onclick="openAdvancedSearchModal()">Advanced Search</button>
         <button class="btn" onclick="exportMembersCSV()">Export CSV</button>
         <button class="btn" onclick="simulateScan()">Simulate Barcode Scan</button>
         <button class="btn btn-solid" onclick="openMemberModal()">+ New Member</button>
       </div>
     </div>
     <div class="page-inner" style="padding:26px 30px;">
-      <div id="scan-result"></div>
-      <div class="grid-3" id="members-grid" style="margin-top:14px;"></div>
+      <div class="view-tabs" id="members-page-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="directory" onclick="setMembersPageTab('directory')">Directory</button>
+        <button class="vtab" data-v="sets" onclick="setMembersPageTab('sets')">Member Sets</button>
+        <button class="vtab" data-v="onhold" onclick="setMembersPageTab('onhold')">On Hold Services</button>
+        <button class="vtab" data-v="corporate" onclick="setMembersPageTab('corporate')">Corporate Groups</button>
+      </div>
+
+      <div id="members-tab-directory">
+        <div id="scan-result"></div>
+        <div class="grid-3" id="members-grid" style="margin-top:14px;"></div>
+      </div>
+
+      <div id="members-tab-sets" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Member Sets</h3><button class="btn btn-sm btn-solid" onclick="openMemberSetModal()">+ New Set</button></div>
+          <table><thead><tr><th>Set Name</th><th>Criteria</th><th>Members</th><th>Created</th></tr></thead><tbody id="member-sets-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="members-tab-onhold" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>On Hold Services</h3><button class="btn btn-sm btn-solid" onclick="openOnHoldModal()">+ Place on Hold</button></div>
+          <table><thead><tr><th>Member</th><th>Service</th><th>Reason</th><th>Hold Start</th><th>Resume Date</th></tr></thead><tbody id="onhold-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="members-tab-corporate" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Corporate Groups</h3><button class="btn btn-sm btn-solid" onclick="openCorporateModal()">+ New Corporate Account</button></div>
+          <table><thead><tr><th>Company</th><th>Contact</th><th>Members Enrolled</th><th>Discount</th><th>Status</th></tr></thead><tbody id="corporate-tbody"></tbody></table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -966,6 +1085,200 @@ tr:hover td{background:rgba(255,255,255,0.015);}
 <div class="toast" id="toast"></div>
 
 <!-- LEAD MODAL -->
+<!-- REPORT DETAIL MODAL -->
+<div class="modal-scrim" id="report-detail-modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="report-detail-title">Report</h3><button class="modal-close" onclick="closeReportDetailModal()">&times;</button></div>
+    <div class="modal-body">
+      <p class="muted" id="report-detail-category" style="margin-bottom:16px;"></p>
+      <div style="padding:40px 0;text-align:center;">
+        <div class="muted">No data yet — this report is ready to run once connected to live billing, membership, and POS data.</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button type="button" class="btn btn-solid" onclick="closeReportDetailModal()">Close</button></div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-scrim" id="event-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Event</h3><button class="modal-close" onclick="closeEventModal()">&times;</button></div>
+    <form id="event-form" onsubmit="saveEvent(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Event Name</label><input id="ev-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Type</label>
+            <select id="ev-type"><option>Group Fitness Class</option><option>Personal Training</option><option>Facility Tour</option><option>Kids Club</option></select>
+          </div>
+          <div class="form-field"><label>Staff</label><input id="ev-staff"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Date</label><input id="ev-date" type="date"></div>
+          <div class="form-field"><label>Capacity</label><input id="ev-capacity" type="number" min="1"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeEventModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Event</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- REPEATING EVENT MODAL -->
+<div class="modal-scrim" id="repeating-event-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Repeating Event</h3><button class="modal-close" onclick="closeRepeatingEventModal()">&times;</button></div>
+    <form id="repeating-event-form" onsubmit="saveRepeatingEvent(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Event Name</label><input id="re-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Frequency</label><select id="re-frequency"><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option></select></div>
+          <div class="form-field"><label>Time</label><input id="re-time" type="time"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Days</label><input id="re-days" placeholder="e.g. Mon, Wed, Fri"></div>
+          <div class="form-field"><label>Staff</label><input id="re-staff"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRepeatingEventModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Repeating Event</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- EVENT GROUP MODAL -->
+<div class="modal-scrim" id="event-group-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Event Group</h3><button class="modal-close" onclick="closeEventGroupModal()">&times;</button></div>
+    <form id="event-group-form" onsubmit="saveEventGroup(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Group Name</label><input id="eg-name" placeholder="e.g. All Group Fitness Classes" required></div>
+        <div class="form-field"><label>Description</label><input id="eg-description"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeEventGroupModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Group</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- ADVANCED SEARCH MODAL -->
+<div class="modal-scrim" id="advanced-search-modal">
+  <div class="modal" style="width:min(680px,92vw);">
+    <div class="modal-head"><h3>Advanced Search</h3><button class="modal-close" onclick="closeAdvancedSearchModal()">&times;</button></div>
+    <form id="advanced-search-form" onsubmit="runAdvancedSearch(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field"><label>Last Name</label><input id="as-last-name"></div>
+          <div class="form-field"><label>First Name</label><input id="as-first-name"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Barcode</label><input id="as-barcode"></div>
+          <div class="form-field"><label>Agreement Number</label><input id="as-agreement"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Master Agreement Number</label><input id="as-master-agreement"></div>
+          <div class="form-field"><label>Previous Agreement Number</label><input id="as-prev-agreement"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Member State</label>
+            <select id="as-member-state"><option value="">All</option><option>Active</option><option>Frozen</option><option>Cancelled</option></select>
+          </div>
+          <div class="form-field"><label>Join Status</label>
+            <select id="as-join-status"><option value="">All</option><option>New</option><option>Renewed</option><option>Transferred</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Relationship</label>
+            <select id="as-relationship"><option value="">All</option><option>Primary</option><option>Secondary</option><option>Dependent</option></select>
+          </div>
+          <div class="form-field"><label>Managed Type</label>
+            <select id="as-managed-type"><option value="">All</option><option>Individual</option><option>Family</option><option>Corporate</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Sales Person</label><select id="as-sales-person"><option value="">All</option></select></div>
+          <div class="form-field"><label>Agreement Term</label>
+            <select id="as-agreement-term"><option value="">All</option><option>Month-to-Month</option><option>12 Month</option><option>24 Month</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Primary Phone</label><input id="as-primary-phone"></div>
+          <div class="form-field"><label>Mobile Phone</label><input id="as-mobile-phone"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Work Phone</label><input id="as-work-phone"></div>
+          <div class="form-field"><label>Email Address</label><input id="as-email" type="email"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeAdvancedSearchModal()">Cancel</button><button type="submit" class="btn btn-solid">Search</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- MEMBER SET MODAL -->
+<div class="modal-scrim" id="member-set-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Member Set</h3><button class="modal-close" onclick="closeMemberSetModal()">&times;</button></div>
+    <form id="member-set-form" onsubmit="saveMemberSet(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Set Name</label><input id="ms-name" placeholder="e.g. Members Joined This Year" required></div>
+        <div class="form-field"><label>Criteria (description)</label><input id="ms-criteria" placeholder="e.g. Join date within last 12 months"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberSetModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Set</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- ON HOLD MODAL -->
+<div class="modal-scrim" id="onhold-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Place Service on Hold</h3><button class="modal-close" onclick="closeOnHoldModal()">&times;</button></div>
+    <form id="onhold-form" onsubmit="saveOnHold(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="oh-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Service</label>
+            <select id="oh-service"><option>Membership Dues</option><option>Personal Training Package</option><option>Reformer Pilates Package</option></select>
+          </div>
+          <div class="form-field"><label>Resume Date</label><input id="oh-resume" type="date"></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Reason</label><input id="oh-reason" placeholder="e.g. Medical, Travel"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeOnHoldModal()">Cancel</button><button type="submit" class="btn btn-solid">Place on Hold</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- CORPORATE GROUP MODAL -->
+<div class="modal-scrim" id="corporate-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Corporate Account</h3><button class="modal-close" onclick="closeCorporateModal()">&times;</button></div>
+    <form id="corporate-form" onsubmit="saveCorporate(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Company Name</label><input id="cg-company" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Contact Name</label><input id="cg-contact"></div>
+          <div class="form-field"><label>Discount %</label><input id="cg-discount" type="number" min="0" max="100"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeCorporateModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Account</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- DRAWER MODAL -->
+<div class="modal-scrim" id="drawer-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Open Drawer</h3><button class="modal-close" onclick="closeDrawerModal()">&times;</button></div>
+    <form id="drawer-form" onsubmit="saveDrawer(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Drawer Name</label><input id="dr-name" placeholder="e.g. Front Desk 1" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Opened By</label><input id="dr-opened-by" required></div>
+          <div class="form-field"><label>Opening Balance ($)</label><input id="dr-balance" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeDrawerModal()">Cancel</button><button type="submit" class="btn btn-solid">Open Drawer</button></div>
+    </form>
+  </div>
+</div>
+
 <!-- DOCUMENT MODAL -->
 <div class="modal-scrim" id="document-modal">
   <div class="modal">
@@ -1166,6 +1479,39 @@ tr:hover td{background:rgba(255,255,255,0.015);}
    analytics/SEO numbers are realistic mock data, and
    SMS/email/payment actions are logged (not actually sent/charged).
    ========================================================= */
+/* =========================================================
+   REPORT CATALOG — static reference list matching the real
+   named reports/dashboards library (not user data — this is
+   the menu of available reports, same as ABC Insights).
+   ========================================================= */
+const REPORT_CATALOG = {
+  standard: [
+    'Daily Events Participation','Daily Production Report','DRDR','First Payment Default',
+    'Initial Invoices Projection','Initial Invoices Projection Detail','Integrated Sales Tax (Ignite)',
+    'Inventory Analysis','Member Changes','Merchant Statement (Ignite POS)','Monthly Billing Statement',
+    'MTD Membership Sales','PIF Cash Liability','Revenue by Payment Type','Revenue by Profit Center',
+    'RFC Preview','RFC To Agency','Services Revenue Summary','Subscription Analysis (Ignite)',
+    'Transaction Details (Ignite POS)','Account Reconciliation (Ignite)','Accounting Journal Entries',
+    'All Members','Available to Collect (Ignite)','Chargeback Details (Ignite POS)','Chargeback Summary',
+    'Club Deposits and Settlements Summary','Club Receipts Summary','Daily Account Adjustments',
+    'Daily Billing Statement','Transfer Candidate',
+  ],
+  adhoc: [
+    'Employee Time Sheets by Employee','Membership Sales by Salesperson','Club Account Past Due',
+    'POS Transactions without a Terminal','Club Account Invoices by Due Date','POS Sales by Profit Center',
+    'Recurring Services Billing Projections','Drawer Summary','POS Income by Profit Center',
+    'Group X Attendance Summary','Sales Commission by Payable Date','Event Commission by Completed Date',
+    'Check in Alerts','Recurring Service Plans Audit','Active but Not Synced Members',
+    'Members by Membership Type','Recurring Services Audit','Corporate Group','Club Account Billing Info Audit',
+  ],
+  dashboards: [
+    'POS Analysis','Price Optimization','Recurring Services Analysis','Revenue Analysis','Revenue Trends',
+    'Salespersons Dashboard','State of the Business','(Preview Feature) Explore My Data','Attrition Analysis',
+    'Check-In Alerts','Class Utilization','Club Account Analysis','Daily Deposit Analysis','Daily Snapshot',
+    'Freeze Analysis','Member Analysis','Member Check-In Analysis','New Joins Analysis','Past Due Analysis',
+  ],
+};
+
 const DB = {
   get(key, fallback){ try{ const v = localStorage.getItem('elevynCC_'+key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } },
   set(key, val){ try{ localStorage.setItem('elevynCC_'+key, JSON.stringify(val)); }catch(e){} },
@@ -1657,6 +2003,19 @@ function seedIfEmpty(){
   DB.set('customReportDraft', []);
   DB.set('savedReports', []);
 
+  // --- Drawer management, member sets, on hold, corporate (empty — ready to populate) ---
+  DB.set('drawers', []);
+  DB.set('posTransactions', []);
+  DB.set('settlements', []);
+  DB.set('memberSets', []);
+  DB.set('onHoldServices', []);
+  DB.set('corporateGroups', []);
+
+  // --- Calendar: events, repeating events, event groups (empty — ready to populate) ---
+  DB.set('scheduledEvents', []);
+  DB.set('repeatingEvents', []);
+  DB.set('eventGroups', []);
+
   DB.set('seeded', true);
 }
 seedIfEmpty();
@@ -2027,7 +2386,107 @@ function renderCalendarGrid(){
   grid += `</div>`;
   document.getElementById('calendar-grid').innerHTML = grid;
 }
-function renderCalendar(){ renderCalendarFilters(); renderCalendarGrid(); }
+function setCalendarPageTab(tab){
+  document.querySelectorAll('#calendar-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#calendar-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['week','events','repeating','groups','enroll'].forEach(t=>{
+    document.getElementById('calendar-tab-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+
+/* ---------- Events ---------- */
+function renderEvents(){
+  const events = DB.get('scheduledEvents',[]);
+  document.getElementById('events-tbody').innerHTML = events.map(e=>`
+    <tr><td>${e.name}</td><td class="muted">${e.type}</td><td class="muted">${e.staff||'—'}</td><td class="muted">${e.date?fmtDate(e.date):'—'}</td><td>${e.capacity||'—'}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No events scheduled yet.</td></tr>';
+}
+function openEventModal(){ document.getElementById('event-form').reset(); document.getElementById('event-modal').classList.add('open'); }
+function closeEventModal(){ document.getElementById('event-modal').classList.remove('open'); }
+function saveEvent(e){
+  e.preventDefault();
+  const events = DB.get('scheduledEvents',[]);
+  events.push({
+    name: document.getElementById('ev-name').value.trim(),
+    type: document.getElementById('ev-type').value,
+    staff: document.getElementById('ev-staff').value.trim(),
+    date: document.getElementById('ev-date').value ? new Date(document.getElementById('ev-date').value).toISOString() : null,
+    capacity: parseInt(document.getElementById('ev-capacity').value)||null,
+  });
+  DB.set('scheduledEvents', events);
+  closeEventModal();
+  renderEvents();
+  toast('Event created.');
+}
+
+/* ---------- Repeating Events ---------- */
+function renderRepeating(){
+  const rows = DB.get('repeatingEvents',[]);
+  document.getElementById('repeating-tbody').innerHTML = rows.map(r=>`
+    <tr><td>${r.name}</td><td class="muted">${r.frequency}</td><td class="muted">${r.days||'—'}</td><td class="muted">${r.time||'—'}</td><td class="muted">${r.staff||'—'}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No repeating events yet.</td></tr>';
+}
+function openRepeatingEventModal(){ document.getElementById('repeating-event-form').reset(); document.getElementById('repeating-event-modal').classList.add('open'); }
+function closeRepeatingEventModal(){ document.getElementById('repeating-event-modal').classList.remove('open'); }
+function saveRepeatingEvent(e){
+  e.preventDefault();
+  const rows = DB.get('repeatingEvents',[]);
+  rows.push({
+    name: document.getElementById('re-name').value.trim(),
+    frequency: document.getElementById('re-frequency').value,
+    days: document.getElementById('re-days').value.trim(),
+    time: document.getElementById('re-time').value,
+    staff: document.getElementById('re-staff').value.trim(),
+  });
+  DB.set('repeatingEvents', rows);
+  closeRepeatingEventModal();
+  renderRepeating();
+  toast('Repeating event created.');
+}
+
+/* ---------- Event Groups ---------- */
+function renderEventGroups(){
+  const groups = DB.get('eventGroups',[]);
+  document.getElementById('event-groups-tbody').innerHTML = groups.map(g=>`
+    <tr><td>${g.name}</td><td class="muted">${g.eventsIncluded||0}</td><td class="muted">${g.description||'—'}</td></tr>
+  `).join('') || '<tr><td colspan="3" class="muted" style="padding:16px;">No event groups yet.</td></tr>';
+}
+function openEventGroupModal(){ document.getElementById('event-group-form').reset(); document.getElementById('event-group-modal').classList.add('open'); }
+function closeEventGroupModal(){ document.getElementById('event-group-modal').classList.remove('open'); }
+function saveEventGroup(e){
+  e.preventDefault();
+  const groups = DB.get('eventGroups',[]);
+  groups.push({
+    name: document.getElementById('eg-name').value.trim(),
+    description: document.getElementById('eg-description').value.trim(),
+    eventsIncluded: 0,
+  });
+  DB.set('eventGroups', groups);
+  closeEventGroupModal();
+  renderEventGroups();
+  toast('Event group created.');
+}
+
+/* ---------- Member-Facing Enroll ---------- */
+function renderMemberEnroll(){
+  const events = DB.get('scheduledEvents',[]);
+  const repeating = DB.get('repeatingEvents',[]);
+  const body = document.getElementById('member-enroll-body');
+  if(!events.length && !repeating.length){
+    body.innerHTML = '<p class="muted" style="padding:20px 0;">No classes or events open for enrollment yet — create one under Events or Repeating Events.</p>';
+    return;
+  }
+  body.innerHTML = [...events.map(e=>({name:e.name, when: e.date?fmtDate(e.date):'TBD'})),
+                     ...repeating.map(r=>({name:r.name, when: r.days+' · '+(r.time||'TBD')}))]
+    .map(item=>`
+      <div class="info-row"><div class="k">${item.name}</div><div class="v">${item.when} <button class="btn btn-sm btn-solid" style="margin-left:10px;" onclick="toast('Enrolled — connect member login for real self-service.')">Enroll</button></div></div>
+    `).join('');
+}
+
+function renderCalendar(){
+  renderCalendarFilters(); renderCalendarGrid();
+  renderEvents(); renderRepeating(); renderEventGroups(); renderMemberEnroll();
+}
 
 function renderConversations(){
   renderConvoList();
@@ -2475,11 +2934,109 @@ function posCheckout(){
     nextDue: new Date().toISOString(), status:'paid'
   });
   DB.set('invoices', invoices);
+  const txns = DB.get('posTransactions',[]);
+  txns.unshift({
+    id: uid('txn'), items: cart.map(c=>`${c.qty}x ${c.name}`).join(', '),
+    amount: Math.round(total*100)/100, method:'Card on File', date: new Date().toISOString(),
+  });
+  DB.set('posTransactions', txns);
   DB.set('posCart', []);
   renderPosCart();
+  renderPosTransactions();
   toast(`Sale complete — ${fmtMoney(total)} logged to Billing.`);
 }
-function renderPos(){ renderPosItems(); renderPosCart(); }
+function setPosPageTab(tab){
+  document.querySelectorAll('#pos-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#pos-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['register','drawers','transactions','settlement'].forEach(t=>{
+    document.getElementById('pos-tab-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+
+/* ---------- Drawer Management ---------- */
+function renderDrawers(){
+  const drawers = DB.get('drawers',[]);
+  document.getElementById('drawers-tbody').innerHTML = drawers.map(d=>`
+    <tr>
+      <td>${d.name}</td><td class="muted">${d.openedBy}</td><td>${fmtMoney(d.balance)}</td>
+      <td><span class="pill ${d.status==='open'?'pill-tour':'pill-member'}">${d.status}</span></td>
+      <td class="muted">${fmtDate(d.openedAt)}</td>
+      <td>${d.status==='open' ? `<button class="btn btn-sm" onclick="closeDrawer('${d.id}')">Close Out</button>` : '<span class="muted">—</span>'}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" class="muted" style="padding:16px;">No drawers opened yet.</td></tr>';
+}
+function openDrawerModal(){ document.getElementById('drawer-form').reset(); document.getElementById('drawer-modal').classList.add('open'); }
+function closeDrawerModal(){ document.getElementById('drawer-modal').classList.remove('open'); }
+function saveDrawer(e){
+  e.preventDefault();
+  const drawers = DB.get('drawers',[]);
+  drawers.push({
+    id: uid('dw'),
+    name: document.getElementById('dr-name').value.trim(),
+    openedBy: document.getElementById('dr-opened-by').value.trim(),
+    balance: parseFloat(document.getElementById('dr-balance').value)||0,
+    status: 'open', openedAt: new Date().toISOString(),
+  });
+  DB.set('drawers', drawers);
+  closeDrawerModal();
+  renderDrawers();
+  renderDrawerSummary();
+  toast('Drawer opened.');
+}
+function closeDrawer(drawerId){
+  const drawers = DB.get('drawers',[]);
+  const d = drawers.find(x=>x.id===drawerId);
+  if(d){ d.status = 'closed'; d.closedAt = new Date().toISOString(); DB.set('drawers', drawers); renderDrawers(); renderDrawerSummary(); toast(`${d.name} closed out.`); }
+}
+function renderDrawerSummary(){
+  const drawers = DB.get('drawers',[]);
+  const open = drawers.filter(d=>d.status==='open').length;
+  const totalBalance = drawers.filter(d=>d.status==='open').reduce((s,d)=>s+d.balance,0);
+  document.getElementById('drawer-summary-body').innerHTML = drawers.length
+    ? `<div class="info-row"><div class="k">Open Drawers</div><div class="v">${open}</div></div>
+       <div class="info-row"><div class="k">Total Opening Balance (Open)</div><div class="v">${fmtMoney(totalBalance)}</div></div>`
+    : '<p class="muted">No drawer activity yet.</p>';
+}
+
+/* ---------- POS Transactions ---------- */
+function renderPosTransactions(){
+  const txns = DB.get('posTransactions',[]);
+  document.getElementById('pos-transactions-tbody').innerHTML = txns.map(t=>`
+    <tr><td>${t.id}</td><td class="muted">${t.items}</td><td>${fmtMoney(t.amount)}</td><td class="muted">${t.method}</td><td class="muted">${fmtDate(t.date)}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No transactions yet — sales rung up at the Register will appear here.</td></tr>';
+}
+
+/* ---------- Settlement & Reconciliation ---------- */
+function renderSettlement(){
+  const settlements = DB.get('settlements',[]);
+  const totalVariance = settlements.reduce((s,r)=>s+Math.abs(r.variance),0);
+  document.getElementById('settlement-kpi-row').innerHTML = `
+    <div class="kpi"><div class="lbl">Reconciliations Run</div><div class="val">${settlements.length}</div></div>
+    <div class="kpi"><div class="lbl">Total Variance</div><div class="val">${fmtMoney(totalVariance)}</div></div>
+    <div class="kpi"><div class="lbl">Clean Settlements</div><div class="val">${settlements.filter(s=>s.variance===0).length}</div></div>
+  `;
+  document.getElementById('settlement-tbody').innerHTML = settlements.map(s=>`
+    <tr><td class="muted">${fmtDate(s.date)}</td><td>${fmtMoney(s.expected)}</td><td>${fmtMoney(s.counted)}</td>
+    <td style="color:${s.variance===0?'var(--good)':'var(--bad)'};">${fmtMoney(s.variance)}</td>
+    <td><span class="pill ${s.variance===0?'pill-member':'pill-due'}">${s.variance===0?'Balanced':'Variance'}</span></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No reconciliations run yet.</td></tr>';
+}
+function runReconciliation(){
+  const drawers = DB.get('drawers',[]);
+  const expected = drawers.reduce((s,d)=>s+d.balance,0);
+  const counted = expected; // no real cash-count input yet — placeholder until wired to real drawer counts
+  const settlements = DB.get('settlements',[]);
+  settlements.unshift({ date: new Date().toISOString(), expected, counted, variance: counted-expected });
+  DB.set('settlements', settlements);
+  renderSettlement();
+  toast('Reconciliation run.');
+}
+
+function renderPos(){
+  renderPosItems(); renderPosCart();
+  renderDrawers(); renderDrawerSummary();
+  renderPosTransactions(); renderSettlement();
+}
 
 /* =========================================================
    MEMBER RETENTION
@@ -2506,6 +3063,34 @@ function renderRetention(){
     </tr>`;
   }).join('');
 }
+
+/* =========================================================
+   REPORT CATALOG
+   ========================================================= */
+let catalogTab = 'standard';
+function setCatalogTab(tab){
+  catalogTab = tab;
+  document.querySelectorAll('#catalog-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#catalog-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  renderCatalog();
+}
+function renderCatalog(){
+  const q = (document.getElementById('catalog-search')||{}).value?.toLowerCase().trim() || '';
+  const names = REPORT_CATALOG[catalogTab].filter(n => !q || n.toLowerCase().includes(q));
+  document.getElementById('catalog-grid').innerHTML = names.map(name=>`
+    <button class="panel" style="padding:16px;text-align:left;cursor:pointer;background:var(--panel-2);border:1px solid var(--line);" onclick="openReportDetailModal('${name.replace(/'/g,"\\'")}', '${catalogTab}')">
+      <div style="font-size:13px;font-weight:600;">${name}</div>
+      <div class="muted" style="font-size:11px;margin-top:6px;text-transform:capitalize;">${catalogTab==='adhoc' ? 'Ad Hoc Report' : (catalogTab==='dashboards' ? 'Dashboard' : 'Standard Report')}</div>
+    </button>
+  `).join('') || '<p class="muted" style="grid-column:1/-1;padding:30px;text-align:center;">No reports match that search.</p>';
+}
+function openReportDetailModal(name, category){
+  document.getElementById('report-detail-title').textContent = name;
+  document.getElementById('report-detail-category').textContent =
+    (category==='adhoc' ? 'Ad Hoc Report' : (category==='dashboards' ? 'Dashboard' : 'Standard Report'));
+  document.getElementById('report-detail-modal').classList.add('open');
+}
+function closeReportDetailModal(){ document.getElementById('report-detail-modal').classList.remove('open'); }
 
 /* =========================================================
    REVIEWS & FEEDBACK — ours vs. competitors, per section,
@@ -2834,6 +3419,134 @@ function renderMembers(){
       </div>
     </div>
   `).join('');
+  renderMemberSets(); renderOnHold(); renderCorporate();
+}
+
+function setMembersPageTab(tab){
+  document.querySelectorAll('#members-page-tabs .vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`#members-page-tabs .vtab[data-v="${tab}"]`).classList.add('active');
+  ['directory','sets','onhold','corporate'].forEach(t=>{
+    document.getElementById('members-tab-'+t).style.display = (t===tab) ? '' : 'none';
+  });
+}
+
+/* ---------- Advanced Search ---------- */
+function openAdvancedSearchModal(){
+  const sel = document.getElementById('as-sales-person');
+  const reps = DB.get('reps',[]);
+  sel.innerHTML = '<option value="">All</option>' + reps.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+  document.getElementById('advanced-search-form').reset();
+  document.getElementById('advanced-search-modal').classList.add('open');
+}
+function closeAdvancedSearchModal(){ document.getElementById('advanced-search-modal').classList.remove('open'); }
+function runAdvancedSearch(e){
+  e.preventDefault();
+  const lastName = document.getElementById('as-last-name').value.trim().toLowerCase();
+  const firstName = document.getElementById('as-first-name').value.trim().toLowerCase();
+  const barcode = document.getElementById('as-barcode').value.trim().toLowerCase();
+  const members = DB.get('members',[]);
+  const matches = members.filter(m=>{
+    const [f,l] = m.name.toLowerCase().split(' ');
+    return (!lastName || (l||'').includes(lastName)) && (!firstName || (f||'').includes(firstName)) && (!barcode || m.barcode.toLowerCase().includes(barcode));
+  });
+  closeAdvancedSearchModal();
+  setMembersPageTab('directory');
+  document.getElementById('members-grid').innerHTML = matches.map(m=>`
+    <div class="member-card">
+      <div class="barcode-wrap">${code128SVG(m.barcode, {width:170, height:50})}</div>
+      <div class="info">
+        <h4>${m.name}</h4>
+        <div class="meta">${m.tier} · <span class="pill pill-${m.status==='active'?'member':'lost'}">${m.status}</span></div>
+        <button class="btn btn-sm" style="margin-top:8px;" onclick="openMemberDetailModal('${m.id}')">View Profile</button>
+      </div>
+    </div>
+  `).join('') || '<p class="muted" style="grid-column:1/-1;padding:30px;text-align:center;">No members match those filters.</p>';
+  toast(`Found ${matches.length} matching member(s).`);
+}
+
+/* ---------- Member Sets ---------- */
+function renderMemberSets(){
+  const sets = DB.get('memberSets',[]);
+  const tbody = document.getElementById('member-sets-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = sets.map(s=>`
+    <tr><td>${s.name}</td><td class="muted">${s.criteria||'—'}</td><td>${s.memberCount}</td><td class="muted">${fmtDate(s.createdAt)}</td></tr>
+  `).join('') || '<tr><td colspan="4" class="muted" style="padding:16px;">No member sets yet.</td></tr>';
+}
+function openMemberSetModal(){ document.getElementById('member-set-form').reset(); document.getElementById('member-set-modal').classList.add('open'); }
+function closeMemberSetModal(){ document.getElementById('member-set-modal').classList.remove('open'); }
+function saveMemberSet(e){
+  e.preventDefault();
+  const sets = DB.get('memberSets',[]);
+  sets.push({
+    name: document.getElementById('ms-name').value.trim(),
+    criteria: document.getElementById('ms-criteria').value.trim(),
+    memberCount: 0, createdAt: new Date().toISOString(),
+  });
+  DB.set('memberSets', sets);
+  closeMemberSetModal();
+  renderMemberSets();
+  toast('Member set created.');
+}
+
+/* ---------- On Hold Services ---------- */
+function renderOnHold(){
+  const holds = DB.get('onHoldServices',[]);
+  const tbody = document.getElementById('onhold-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = holds.map(h=>`
+    <tr><td>${h.memberName}</td><td class="muted">${h.service}</td><td class="muted">${h.reason||'—'}</td><td class="muted">${fmtDate(h.holdStart)}</td><td class="muted">${h.resumeDate ? fmtDate(h.resumeDate) : '—'}</td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No services on hold.</td></tr>';
+}
+function openOnHoldModal(){
+  const sel = document.getElementById('oh-member');
+  const members = DB.get('members',[]);
+  sel.innerHTML = members.map(m=>`<option value="${m.id}" data-name="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('onhold-form').reset();
+  document.getElementById('onhold-modal').classList.add('open');
+}
+function closeOnHoldModal(){ document.getElementById('onhold-modal').classList.remove('open'); }
+function saveOnHold(e){
+  e.preventDefault();
+  const sel = document.getElementById('oh-member');
+  const memberName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].dataset.name : 'Unknown';
+  const holds = DB.get('onHoldServices',[]);
+  holds.push({
+    memberName, service: document.getElementById('oh-service').value,
+    reason: document.getElementById('oh-reason').value.trim(),
+    holdStart: new Date().toISOString(),
+    resumeDate: document.getElementById('oh-resume').value ? new Date(document.getElementById('oh-resume').value).toISOString() : null,
+  });
+  DB.set('onHoldServices', holds);
+  closeOnHoldModal();
+  renderOnHold();
+  toast('Service placed on hold.');
+}
+
+/* ---------- Corporate Groups ---------- */
+function renderCorporate(){
+  const groups = DB.get('corporateGroups',[]);
+  const tbody = document.getElementById('corporate-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = groups.map(g=>`
+    <tr><td>${g.company}</td><td class="muted">${g.contact||'—'}</td><td>${g.membersEnrolled}</td><td>${g.discount}%</td><td><span class="pill pill-member">${g.status}</span></td></tr>
+  `).join('') || '<tr><td colspan="5" class="muted" style="padding:16px;">No corporate accounts yet.</td></tr>';
+}
+function openCorporateModal(){ document.getElementById('corporate-form').reset(); document.getElementById('corporate-modal').classList.add('open'); }
+function closeCorporateModal(){ document.getElementById('corporate-modal').classList.remove('open'); }
+function saveCorporate(e){
+  e.preventDefault();
+  const groups = DB.get('corporateGroups',[]);
+  groups.push({
+    company: document.getElementById('cg-company').value.trim(),
+    contact: document.getElementById('cg-contact').value.trim(),
+    discount: parseFloat(document.getElementById('cg-discount').value)||0,
+    membersEnrolled: 0, status:'active',
+  });
+  DB.set('corporateGroups', groups);
+  closeCorporateModal();
+  renderCorporate();
+  toast('Corporate account created.');
 }
 
 function openMemberDetailModal(memberId){
@@ -3413,6 +4126,7 @@ const RENDERERS = {
   billing: renderBilling,
   payments: renderPayments,
   reviews: renderReviews,
+  catalog: renderCatalog,
   editor: ()=> { loadSiteEditor('wellness'); loadSiteEditor('studios'); },
   media: renderMedia,
   social: renderSocial,
