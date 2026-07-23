@@ -139,9 +139,10 @@
 
       <div id="payments-gateway" style="display:none;">
         <div class="panel">
-          <div class="panel-head"><h3>Connection Status</h3></div>
+          <div class="panel-head"><h3>Connection Status</h3><button class="btn btn-sm btn-solid" onclick="syncPaymentStatus(true)">Sync Payments Now</button></div>
           <div class="panel-body">
             <div class="kpi-row" id="gateway-status-row" style="grid-template-columns:repeat(2,1fr);margin-bottom:0;"></div>
+            <p class="small-note" style="margin-top:14px;">Pulls real completed payments from your backend and marks the matching invoice, POS sale, or payment link as paid here. Runs automatically when you open Billing, Point of Sale, or this page — use this button to check right now.</p>
           </div>
         </div>
 

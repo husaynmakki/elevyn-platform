@@ -75,19 +75,58 @@ Once deployed, you'll get a URL like `https://elevyn-payments.onrender.com`.
    across the whole platform will redirect to a real, live Stripe
    Checkout page for that exact amount
 
-## About the webhook (optional, for later)
+## How payment status makes it back into the Command Center
 
-Right now, this server creates real checkout sessions, but it doesn't
-automatically know *when* a customer finishes paying — that requires
-setting up a webhook in the Stripe Dashboard pointed at
-`https://your-server.com/webhook`. The code for handling that is already
-in `server.js` (it currently just logs the completed payment). Wiring
-that further back into the Command Center's own records would mean
-giving the Command Center a real database instead of browser storage —
-a reasonable next step once you're comfortable with this piece.
+This is the part that used to require a real database — now it works:
+
+1. When you click "Collect Payment" (or check out a POS sale, or pay a
+   Payment Link), the Command Center sends along a reference ID (the
+   invoice ID, transaction ID, etc.) as Stripe metadata.
+2. When the customer actually finishes paying, Stripe calls this
+   server's `/webhook` endpoint, and the payment — along with that
+   reference ID — gets written to `payments-log.json`.
+3. The Command Center periodically asks this server "what's completed
+   since I last checked?" via `/completed-payments`, and automatically
+   marks the matching invoice, POS sale, or payment link as paid.
+
+This sync runs automatically every time you open Billing, Point of
+Sale, or the Payment Gateway tab, or you can trigger it manually with
+the **Sync Payments Now** button on the Payment Gateway tab.
+
+### Setting up the webhook (required for sync to work)
+
+1. In the Stripe Dashboard, go to **Developers → Webhooks → Add
+   endpoint**
+2. Set the endpoint URL to `https://your-deployed-server.com/webhook`
+3. Select the `checkout.session.completed` event
+4. Stripe will give you a **signing secret** (starts with `whsec_`) —
+   copy it into your `.env` file as `STRIPE_WEBHOOK_SECRET`, then
+   redeploy
+
+Without this step, checkout still works and customers can still pay —
+you just won't get the automatic sync back into the Command Center's
+records, since the server won't know a payment happened. In that case
+you'd still see it appear as a completed session directly in your
+Stripe Dashboard.
+
+### About the storage (please read before relying on this for real money)
+
+Completed payments are currently kept in a `payments-log.json` file on
+the server. This is genuinely real and works — but most free hosting
+tiers (Render, Railway, etc.) use an **ephemeral filesystem**, meaning
+that file can be wiped whenever the host restarts your server (which
+can happen for all kinds of routine reasons — deploys, scaling,
+inactivity). For light use or testing, that's a fine tradeoff. Once
+you're relying on this for real money, swap the three storage functions
+at the top of `server.js` (`loadPayments` / `savePayment` /
+`getPaymentsSince`) to use a real database instead — a free tier of
+Postgres or Redis from the same host works well and is a small change,
+not a rewrite.
 
 ## Files in this folder
 
 - `server.js` — the actual server code
 - `package.json` — dependency list
 - `.env.example` — template for your configuration (copy to `.env`)
+- `payments-log.json` — created automatically once your first payment
+  completes; this is the file-based store described above
