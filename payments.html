@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Links & Gift Cards — Elevyn Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sb-logo">
+    <img src="data:image/png;base64,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" alt="Elevyn">
+    <div><div style="font-size:13px;font-weight:600;">Command Center</div><div class="sub">Internal Platform</div></div>
+  </div>
+
+  <div class="view-sites-wrap">
+    <button class="view-sites-btn" onclick="toggleViewSitesMenu()" type="button">
+      &#127760; View Live Sites
+    </button>
+    <div class="view-sites-menu" id="view-sites-menu">
+      <a href="../elevyn-wellness/index.html" target="_blank" rel="noopener">
+        <span class="dot"></span> Elevyn Wellness Elevated
+      </a>
+      <a href="../elevyn-studios/index.html" target="_blank" rel="noopener">
+        <span class="dot"></span> Elevyn Studios
+      </a>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <a class="nav-item" href="index.html" data-page="dashboard"><span class="ic">&#9673;</span><span class="lbl">Dashboard</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Growth</div>
+    <a class="nav-item" href="conversations.html" data-page="conversations"><span class="ic">&#128172;</span><span class="lbl">Conversations</span></a>
+    <a class="nav-item" href="contacts.html" data-page="contacts"><span class="ic">&#128101;</span><span class="lbl">Contacts</span></a>
+    <a class="nav-item" href="leads.html" data-page="leads"><span class="ic">&#9737;</span><span class="lbl">Leads</span></a>
+    <a class="nav-item" href="primary-members.html" data-page="primarymembers"><span class="ic">&#127942;</span><span class="lbl">Primary Members</span></a>
+    <a class="nav-item" href="calendar.html" data-page="calendar"><span class="ic">&#128197;</span><span class="lbl">Calendar</span></a>
+    <a class="nav-item" href="sales-reps.html" data-page="reps"><span class="ic">&#9787;</span><span class="lbl">Sales Reps</span></a>
+    <a class="nav-item" href="marketing.html" data-page="marketing"><span class="ic">&#9993;</span><span class="lbl">Marketing</span></a>
+    <a class="nav-item" href="marketing-reports.html" data-page="reports"><span class="ic">&#128202;</span><span class="lbl">Marketing Reports</span></a>
+    <a class="nav-item" href="seo.html" data-page="seo"><span class="ic">&#128269;</span><span class="lbl">SEO Strategy</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Operations</div>
+    <a class="nav-item" href="checkin.html" data-page="checkin"><span class="ic">&#128100;</span><span class="lbl">Front Desk Check-In</span></a>
+    <a class="nav-item" href="pos.html" data-page="pos"><span class="ic">&#128181;</span><span class="lbl">Point of Sale</span></a>
+    <a class="nav-item" href="members.html" data-page="members"><span class="ic">&#127915;</span><span class="lbl">Memberships</span></a>
+    <a class="nav-item" href="billing.html" data-page="billing"><span class="ic">&#128179;</span><span class="lbl">Billing</span></a>
+    <a class="nav-item active" href="payments.html" data-page="payments"><span class="ic">&#127991;</span><span class="lbl">Payment Links &amp; Gift Cards</span></a>
+    <a class="nav-item" href="analytics.html" data-page="analytics"><span class="ic">&#128200;</span><span class="lbl">Analytics</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Insights</div>
+    <a class="nav-item" href="report-catalog.html" data-page="catalog"><span class="ic">&#128218;</span><span class="lbl">Report Catalog</span></a>
+    <a class="nav-item" href="retention.html" data-page="retention"><span class="ic">&#9888;</span><span class="lbl">Member Retention</span></a>
+    <a class="nav-item" href="reviews.html" data-page="reviews"><span class="ic">&#9733;</span><span class="lbl">Reviews &amp; Feedback</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Content &amp; Social</div>
+    <a class="nav-item" href="media.html" data-page="media"><span class="ic">&#128247;</span><span class="lbl">Media Library</span></a>
+    <a class="nav-item" href="social.html" data-page="social"><span class="ic">&#128172;</span><span class="lbl">Social Media</span></a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Sites</div>
+    <a class="nav-item" href="site-config.html" data-page="editor"><span class="ic">&#9998;</span><span class="lbl">Site Configuration</span></a>
+  </div>
+
+  <div class="sb-foot">
+    <div class="who">Admin User</div>
+    <div class="role">Owner / Full Access</div>
+    <div style="margin-top:14px;display:flex;gap:6px;">
+      <button class="btn btn-sm" style="flex:1;" onclick="exportAllData()">Backup</button>
+      <label class="btn btn-sm" style="flex:1;text-align:center;cursor:pointer;">
+        Restore
+        <input type="file" id="restore-file-input" accept="application/json" style="display:none;" onchange="importAllData(event)">
+      </label>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page active" id="page-payments">
+<div class="topbar"><div><h1>Payment Links &amp; Gift Cards</h1><div class="sub">Shareable payment links, coupon codes, gift cards, and the product catalog</div></div></div>
+    <div class="page-inner" style="padding:26px 30px;">
+      <div class="view-tabs" id="payments-tabs" style="margin-bottom:20px;">
+        <button class="vtab active" data-v="links" onclick="setPaymentsTab('links')">Payment Links</button>
+        <button class="vtab" data-v="coupons" onclick="setPaymentsTab('coupons')">Coupons</button>
+        <button class="vtab" data-v="giftcards" onclick="setPaymentsTab('giftcards')">Gift Cards</button>
+        <button class="vtab" data-v="products" onclick="setPaymentsTab('products')">Products</button>
+        <button class="vtab" data-v="documents" onclick="setPaymentsTab('documents')">Documents &amp; Contracts</button>
+        <button class="vtab" data-v="gateway" onclick="setPaymentsTab('gateway')">Payment Gateway</button>
+      </div>
+
+      <div id="payments-links">
+        <div class="panel">
+          <div class="panel-head"><h3>Payment Links</h3><button class="btn btn-sm btn-solid" onclick="openPaymentLinkModal()">+ New Link</button></div>
+          <table><thead><tr><th>Name</th><th>Amount</th><th>Link</th><th>Uses</th><th>Status</th><th></th></tr></thead><tbody id="payment-links-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="payments-coupons" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Coupons</h3><button class="btn btn-sm btn-solid" onclick="openCouponModal()">+ New Coupon</button></div>
+          <table><thead><tr><th>Code</th><th>Discount</th><th>Applies To</th><th>Redemptions</th><th>Status</th></tr></thead><tbody id="coupons-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="payments-giftcards" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Gift Cards</h3><button class="btn btn-sm btn-solid" onclick="openGiftCardModal()">+ New Gift Card</button></div>
+          <table><thead><tr><th>Code</th><th>Original Value</th><th>Remaining</th><th>Purchased By</th><th>Status</th></tr></thead><tbody id="giftcards-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="payments-products" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Products</h3></div>
+          <table><thead><tr><th>Product</th><th>Type</th><th>Price</th></tr></thead><tbody id="payment-products-tbody"></tbody></table>
+        </div>
+      </div>
+
+      <div id="payments-documents" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Documents &amp; Contracts</h3><button class="btn btn-sm btn-solid" onclick="openDocumentModal()">+ New Document</button></div>
+          <table><thead><tr><th>Document</th><th>Recipient</th><th>Type</th><th>Status</th><th>Sent</th></tr></thead><tbody id="documents-tbody"></tbody></table>
+        </div>
+        <p class="small-note">Sending a document logs it here as "Sent." Actually collecting a real e-signature requires an e-signature provider (like the one built into GoldCore, or DocuSign/HelloSign) connected on a backend.</p>
+      </div>
+
+      <div id="payments-gateway" style="display:none;">
+        <div class="panel">
+          <div class="panel-head"><h3>Connection Status</h3></div>
+          <div class="panel-body">
+            <div class="kpi-row" id="gateway-status-row" style="grid-template-columns:repeat(2,1fr);margin-bottom:0;"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Backend Checkout Endpoint <span class="muted" style="font-weight:400;">(recommended — supports any amount)</span></h3></div>
+          <form id="gateway-backend-form" onsubmit="saveGatewayBackend(event)">
+            <div class="panel-body">
+              <div class="form-field" style="margin-bottom:14px;">
+                <label>Checkout Endpoint URL</label>
+                <input type="text" id="gw-endpoint" placeholder="https://your-deployed-server.onrender.com">
+              </div>
+              <div class="cta-row" style="display:flex;gap:10px;">
+                <button type="submit" class="btn btn-solid">Save</button>
+                <button type="button" class="btn" onclick="testGatewayConnection()">Test Connection</button>
+              </div>
+              <p class="small-note">This should point at the deployed <code>elevyn-payment-server</code> (see the README in your download) — a small real backend that creates genuine Stripe Checkout Sessions for any dollar amount. Deploy it once, paste its URL here, and every "Collect Payment" / "Checkout" button across the whole platform will redirect to a real, live Stripe payment page.</p>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Static Payment Link <span class="muted" style="font-weight:400;">(fallback — fixed price only)</span></h3></div>
+          <form id="gateway-link-form" onsubmit="saveGatewayLink(event)">
+            <div class="panel-body">
+              <div class="form-field" style="margin-bottom:14px;">
+                <label>Stripe (or Square/PayPal) Payment Link</label>
+                <input type="text" id="gw-static-link" placeholder="https://buy.stripe.com/xxxxx or https://paypal.me/yourbusiness">
+              </div>
+              <button type="submit" class="btn btn-solid">Save</button>
+              <p class="small-note">Create this in your Stripe Dashboard under Payment Links (or Square/PayPal's equivalent) — no code required. This is used automatically when no backend endpoint is configured above. Because it's a fixed-price link, it works well for things like a Day Pass or Gift Card purchase, but can't charge a specific invoice amount — the backend option above is what enables that.</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-scrim" id="report-detail-modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="report-detail-title">Report</h3><button class="modal-close" onclick="closeReportDetailModal()">&times;</button></div>
+    <div class="modal-body">
+      <p class="muted" id="report-detail-category" style="margin-bottom:16px;"></p>
+      <div style="padding:40px 0;text-align:center;">
+        <div class="muted">No data yet — this report is ready to run once connected to live billing, membership, and POS data.</div>
+      </div>
+    </div>
+    <div class="modal-foot"><button type="button" class="btn btn-solid" onclick="closeReportDetailModal()">Close</button></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="event-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Event</h3><button class="modal-close" onclick="closeEventModal()">&times;</button></div>
+    <form id="event-form" onsubmit="saveEvent(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Event Name</label><input id="ev-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Type</label>
+            <select id="ev-type"><option>Group Fitness Class</option><option>Personal Training</option><option>Facility Tour</option><option>Kids Club</option></select>
+          </div>
+          <div class="form-field"><label>Staff</label><input id="ev-staff"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Date</label><input id="ev-date" type="date"></div>
+          <div class="form-field"><label>Capacity</label><input id="ev-capacity" type="number" min="1"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeEventModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Event</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="repeating-event-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Repeating Event</h3><button class="modal-close" onclick="closeRepeatingEventModal()">&times;</button></div>
+    <form id="repeating-event-form" onsubmit="saveRepeatingEvent(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Event Name</label><input id="re-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Frequency</label><select id="re-frequency"><option>Weekly</option><option>Bi-Weekly</option><option>Monthly</option></select></div>
+          <div class="form-field"><label>Time</label><input id="re-time" type="time"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Days</label><input id="re-days" placeholder="e.g. Mon, Wed, Fri"></div>
+          <div class="form-field"><label>Staff</label><input id="re-staff"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRepeatingEventModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Repeating Event</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="event-group-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Event Group</h3><button class="modal-close" onclick="closeEventGroupModal()">&times;</button></div>
+    <form id="event-group-form" onsubmit="saveEventGroup(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Group Name</label><input id="eg-name" placeholder="e.g. All Group Fitness Classes" required></div>
+        <div class="form-field"><label>Description</label><input id="eg-description"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeEventGroupModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Group</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="advanced-search-modal">
+  <div class="modal" style="width:min(680px,92vw);">
+    <div class="modal-head"><h3>Advanced Search</h3><button class="modal-close" onclick="closeAdvancedSearchModal()">&times;</button></div>
+    <form id="advanced-search-form" onsubmit="runAdvancedSearch(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field"><label>Last Name</label><input id="as-last-name"></div>
+          <div class="form-field"><label>First Name</label><input id="as-first-name"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Barcode</label><input id="as-barcode"></div>
+          <div class="form-field"><label>Agreement Number</label><input id="as-agreement"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Master Agreement Number</label><input id="as-master-agreement"></div>
+          <div class="form-field"><label>Previous Agreement Number</label><input id="as-prev-agreement"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Member State</label>
+            <select id="as-member-state"><option value="">All</option><option>Active</option><option>Frozen</option><option>Cancelled</option></select>
+          </div>
+          <div class="form-field"><label>Join Status</label>
+            <select id="as-join-status"><option value="">All</option><option>New</option><option>Renewed</option><option>Transferred</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Relationship</label>
+            <select id="as-relationship"><option value="">All</option><option>Primary</option><option>Secondary</option><option>Dependent</option></select>
+          </div>
+          <div class="form-field"><label>Managed Type</label>
+            <select id="as-managed-type"><option value="">All</option><option>Individual</option><option>Family</option><option>Corporate</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Sales Person</label><select id="as-sales-person"><option value="">All</option></select></div>
+          <div class="form-field"><label>Agreement Term</label>
+            <select id="as-agreement-term"><option value="">All</option><option>Month-to-Month</option><option>12 Month</option><option>24 Month</option></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Primary Phone</label><input id="as-primary-phone"></div>
+          <div class="form-field"><label>Mobile Phone</label><input id="as-mobile-phone"></div>
+        </div>
+        <div class="form-row" style="margin-top:12px;">
+          <div class="form-field"><label>Work Phone</label><input id="as-work-phone"></div>
+          <div class="form-field"><label>Email Address</label><input id="as-email" type="email"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeAdvancedSearchModal()">Cancel</button><button type="submit" class="btn btn-solid">Search</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="member-set-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Member Set</h3><button class="modal-close" onclick="closeMemberSetModal()">&times;</button></div>
+    <form id="member-set-form" onsubmit="saveMemberSet(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Set Name</label><input id="ms-name" placeholder="e.g. Members Joined This Year" required></div>
+        <div class="form-field"><label>Criteria (description)</label><input id="ms-criteria" placeholder="e.g. Join date within last 12 months"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberSetModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Set</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="onhold-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Place Service on Hold</h3><button class="modal-close" onclick="closeOnHoldModal()">&times;</button></div>
+    <form id="onhold-form" onsubmit="saveOnHold(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="oh-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Service</label>
+            <select id="oh-service"><option>Membership Dues</option><option>Personal Training Package</option><option>Reformer Pilates Package</option></select>
+          </div>
+          <div class="form-field"><label>Resume Date</label><input id="oh-resume" type="date"></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Reason</label><input id="oh-reason" placeholder="e.g. Medical, Travel"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeOnHoldModal()">Cancel</button><button type="submit" class="btn btn-solid">Place on Hold</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="corporate-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Corporate Account</h3><button class="modal-close" onclick="closeCorporateModal()">&times;</button></div>
+    <form id="corporate-form" onsubmit="saveCorporate(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Company Name</label><input id="cg-company" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Contact Name</label><input id="cg-contact"></div>
+          <div class="form-field"><label>Discount %</label><input id="cg-discount" type="number" min="0" max="100"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeCorporateModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Account</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="new-agreement-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Agreement</h3><button class="modal-close" onclick="closeNewAgreementModal()">&times;</button></div>
+    <form id="new-agreement-form" onsubmit="saveNewAgreement(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="ag-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Membership Type</label><select id="ag-type"><option>Elevate</option><option>Elevate+</option><option>All-Access</option></select></div>
+          <div class="form-field"><label>Term</label><select id="ag-term"><option>Month-to-Month</option><option>12 Month</option><option>24 Month</option></select></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeNewAgreementModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Agreement</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="recurring-service-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Recurring Service</h3><button class="modal-close" onclick="closeRecurringServiceModal()">&times;</button></div>
+    <form id="recurring-service-form" onsubmit="saveRecurringService(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="rs-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Service</label><select id="rs-service"><option>Personal Training Package</option><option>Reformer Pilates Package</option><option>Kids Club</option></select></div>
+          <div class="form-field"><label>Amount ($)</label><input id="rs-amount" type="number" step="0.01" required></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Frequency</label><select id="rs-frequency"><option>Monthly</option><option>Weekly</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRecurringServiceModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Service</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="fast-add-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Fast Add</h3><button class="modal-close" onclick="closeFastAddModal()">&times;</button></div>
+    <form id="fast-add-form" onsubmit="saveFastAdd(event)">
+      <div class="modal-body">
+        <div class="form-field"><label>Name</label><input id="fa-name" required></div>
+        <p class="small-note">Fast Add creates a minimal member record instantly — fill in the rest of their profile later from the Directory.</p>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeFastAddModal()">Cancel</button><button type="submit" class="btn btn-solid">Add Member</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="add-secondary-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add Secondary Member</h3><button class="modal-close" onclick="closeAddSecondaryModal()">&times;</button></div>
+    <form id="add-secondary-form" onsubmit="saveAddSecondary(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Secondary Member Name</label><input id="sec-name" required></div>
+        <div class="form-field"><label>Relationship</label><select id="sec-relationship"><option>Spouse</option><option>Child</option><option>Dependent</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeAddSecondaryModal()">Cancel</button><button type="submit" class="btn btn-solid">Add to Agreement</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="member-document-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Create Member Document</h3><button class="modal-close" onclick="closeMemberDocumentModal()">&times;</button></div>
+    <form id="member-document-form" onsubmit="saveMemberDocument(event)">
+      <div class="modal-body">
+        <div class="form-field"><label>Document Type</label><select id="md-type"><option>Cancellation Letter</option><option>Freeze Confirmation</option><option>Account Statement</option><option>Custom Letter</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberDocumentModal()">Cancel</button><button type="submit" class="btn btn-solid">Generate Document</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="gc-transaction-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Gift Card Transaction</h3><button class="modal-close" onclick="closeGcTransactionModal()">&times;</button></div>
+    <form id="gc-transaction-form" onsubmit="saveGcTransaction(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Gift Card Code</label><select id="gct-card"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Type</label><select id="gct-type"><option value="redemption">Redemption</option><option value="load">Load / Reload</option></select></div>
+          <div class="form-field"><label>Amount ($)</label><input id="gct-amount" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeGcTransactionModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Transaction</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="club-billing-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Charge to Club Account</h3><button class="modal-close" onclick="closeClubBillingModal()">&times;</button></div>
+    <form id="club-billing-form" onsubmit="saveClubBilling(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="cb-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Item / Description</label><input id="cb-item" required></div>
+          <div class="form-field"><label>Amount ($)</label><input id="cb-amount" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeClubBillingModal()">Cancel</button><button type="submit" class="btn btn-solid">Charge Account</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="unattended-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Unattended Check-In</h3><button class="modal-close" onclick="closeUnattendedModal()">&times;</button></div>
+    <form id="unattended-form" onsubmit="saveUnattended(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="un-member"></select></div>
+        <div class="form-field"><label>Method</label><select id="un-method"><option>Kiosk</option><option>Mobile App</option><option>Key Fob</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeUnattendedModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Check-In</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="checkin-alert-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Check-In Alert</h3><button class="modal-close" onclick="closeCheckinAlertModal()">&times;</button></div>
+    <form id="checkin-alert-form" onsubmit="saveCheckinAlert(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="ca-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Alert Message</label><input id="ca-message" placeholder="e.g. Past due balance" required></div>
+          <div class="form-field"><label>Severity</label><select id="ca-severity"><option>Info</option><option>Warning</option><option>Critical</option></select></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeCheckinAlertModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Alert</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="remote-checkin-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Log Remote Check-In</h3><button class="modal-close" onclick="closeRemoteCheckinModal()">&times;</button></div>
+    <form id="remote-checkin-form" onsubmit="saveRemoteCheckin(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="rc-member"></select></div>
+        <div class="form-field"><label>Location</label><input id="rc-location" placeholder="e.g. Partner gym, mobile geofence"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeRemoteCheckinModal()">Cancel</button><button type="submit" class="btn btn-solid">Log Check-In</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="drawer-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Open Drawer</h3><button class="modal-close" onclick="closeDrawerModal()">&times;</button></div>
+    <form id="drawer-form" onsubmit="saveDrawer(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Drawer Name</label><input id="dr-name" placeholder="e.g. Front Desk 1" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Opened By</label><input id="dr-opened-by" required></div>
+          <div class="form-field"><label>Opening Balance ($)</label><input id="dr-balance" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeDrawerModal()">Cancel</button><button type="submit" class="btn btn-solid">Open Drawer</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="document-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Document</h3><button class="modal-close" onclick="closeDocumentModal()">&times;</button></div>
+    <form id="document-form" onsubmit="saveDocument(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Document Name</label><input id="doc-name" placeholder="e.g. Membership Agreement" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Recipient</label><input id="doc-recipient" required></div>
+          <div class="form-field"><label>Type</label>
+            <select id="doc-type"><option>Membership Agreement</option><option>Waiver</option><option>Personal Training Contract</option><option>Corporate Agreement</option></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeDocumentModal()">Cancel</button><button type="submit" class="btn btn-solid">Send for Signature</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="pm-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add to Primary Members Pipeline</h3><button class="modal-close" onclick="closePmModal()">&times;</button></div>
+    <form id="pm-form" onsubmit="savePm(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="pm-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Household Type</label>
+            <select id="pm-type"><option value="Single">Single</option><option value="Couple">Couple</option><option value="Family">Family</option></select>
+          </div>
+          <div class="form-field"><label>Stage</label>
+            <select id="pm-stage">
+              <option value="new-lead">New Lead</option><option value="household">Single/Couple/Family</option>
+              <option value="joined">Joined the Club</option><option value="won">Won</option><option value="lost">Lost/Abandoned</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closePmModal()">Cancel</button><button type="submit" class="btn btn-solid">Add to Pipeline</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="contact-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Add Contact</h3><button class="modal-close" onclick="closeContactModal()">&times;</button></div>
+    <form id="contact-form" onsubmit="saveContact(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="ct-name" required></div>
+        <div class="form-row">
+          <div class="form-field"><label>Phone</label><input id="ct-phone"></div>
+          <div class="form-field"><label>Email</label><input id="ct-email" type="email"></div>
+        </div>
+        <div class="form-field" style="margin-top:12px;"><label>Business Name (optional)</label><input id="ct-business"></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeContactModal()">Cancel</button><button type="submit" class="btn btn-solid">Save Contact</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="lead-modal">
+  <div class="modal">
+    <div class="modal-head"><h3 id="lead-modal-title">Add Lead</h3><button class="modal-close" onclick="closeLeadModal()">&times;</button></div>
+    <form id="lead-form" onsubmit="saveLead(event)">
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-field"><label>Name</label><input id="lf-name" required></div>
+          <div class="form-field"><label>Email</label><input id="lf-email" type="email"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Phone</label><input id="lf-phone"></div>
+          <div class="form-field"><label>Source</label>
+            <select id="lf-source">
+              <option>Website Form</option><option>Instagram Ad</option><option>Walk-In</option>
+              <option>Referral</option><option>Google Search</option><option>Kids Club Flyer</option><option>Shop Checkout</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Stage</label>
+            <select id="lf-stage">
+              <option value="new">New</option><option value="contacted">Contacted</option>
+              <option value="tour">Tour Booked</option><option value="trial">Trial</option>
+              <option value="member">Member</option><option value="lost">Lost</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Assigned Rep</label><select id="lf-rep"></select></div>
+        </div>
+        <div class="form-field"><label>Notes</label><textarea id="lf-notes" rows="3"></textarea></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeLeadModal()">Cancel</button><button type="submit" class="btn btn-solid">Save Lead</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="member-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Member</h3><button class="modal-close" onclick="closeMemberModal()">&times;</button></div>
+    <form id="member-form" onsubmit="saveMember(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="mf-name" required></div>
+        <div class="form-field" style="margin-bottom:12px;"><label>Email</label><input id="mf-email" type="email"></div>
+        <div class="form-field"><label>Tier</label><select id="mf-tier"><option>Elevate</option><option>Elevate+</option><option>All-Access</option></select></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberModal()">Cancel</button><button type="submit" class="btn btn-solid">Create + Generate Barcode</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="member-detail-modal">
+  <div class="modal" style="width:min(640px,92vw);">
+    <div class="modal-head"><h3>Member Profile</h3><button class="modal-close" onclick="closeMemberDetailModal()">&times;</button></div>
+    <div class="modal-body" id="member-detail-body"></div>
+    <div class="modal-foot"><button type="button" class="btn" onclick="closeMemberDetailModal()">Close</button></div>
+  </div>
+</div>
+
+<div class="modal-scrim" id="invoice-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Billing Schedule</h3><button class="modal-close" onclick="closeInvoiceModal()">&times;</button></div>
+    <form id="invoice-form" onsubmit="saveInvoice(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Member</label><select id="inv-member"></select></div>
+        <div class="form-row">
+          <div class="form-field"><label>Category</label>
+            <select id="inv-category">
+              <option>Membership Dues</option><option>Personal Training Package</option>
+              <option>Reformer Pilates Package</option><option>Court Rental</option>
+              <option>Kids Club</option><option>Merch Order</option>
+            </select>
+          </div>
+          <div class="form-field"><label>Amount ($)</label><input id="inv-amount" type="number" step="0.01" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label>Billing Cycle</label><select id="inv-cycle"><option value="one-time">One-Time</option><option value="monthly">Monthly</option><option value="weekly">Weekly</option></select></div>
+          <div class="form-field"><label>Next Due Date</label><input id="inv-date" type="date"></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeInvoiceModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Schedule</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="coupon-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Coupon</h3><button class="modal-close" onclick="closeCouponModal()">&times;</button></div>
+    <form id="coupon-form" onsubmit="saveCoupon(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Code</label><input id="cp-code" placeholder="e.g. SUMMER25" required style="text-transform:uppercase;"></div>
+        <div class="form-row">
+          <div class="form-field"><label>Discount Type</label><select id="cp-type"><option value="percent">Percent Off</option><option value="flat">Flat Amount Off</option></select></div>
+          <div class="form-field"><label>Value</label><input id="cp-value" type="number" step="0.01" required></div>
+        </div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeCouponModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Coupon</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="giftcard-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Gift Card</h3><button class="modal-close" onclick="closeGiftCardModal()">&times;</button></div>
+    <form id="giftcard-form" onsubmit="saveGiftCard(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Amount ($)</label><input id="gc-amount" type="number" step="0.01" required></div>
+        <p class="small-note">A unique code is generated automatically when you create the card.</p>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closeGiftCardModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Gift Card</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-scrim" id="payment-link-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>New Payment Link</h3><button class="modal-close" onclick="closePaymentLinkModal()">&times;</button></div>
+    <form id="payment-link-form" onsubmit="savePaymentLink(event)">
+      <div class="modal-body">
+        <div class="form-field" style="margin-bottom:12px;"><label>Name</label><input id="pl-name" placeholder="e.g. Summer Court Pass" required></div>
+        <div class="form-field"><label>Amount ($)</label><input id="pl-amount" type="number" step="0.01" required></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn" onclick="closePaymentLinkModal()">Cancel</button><button type="submit" class="btn btn-solid">Create Link</button></div>
+    </form>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    if (typeof RENDERERS !== 'undefined' && RENDERERS['payments']) {
+      RENDERERS['payments']();
+    }
+  });
+</script>
+</body>
+</html>
